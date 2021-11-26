@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 
 // import des routes
-// const sauceRoutes = require("./routes/sauces.js");
+const userRoutes = require("./routes/users.js");
 
 // import des variables environnementales
 const dotEnv = require("dotenv");
@@ -27,13 +27,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// on transforme le corps de la requête en objet maintenable
+// configuration bodyparser
+// pour forcer le parse dans des objets inclus dans d'autres objets
+app.use(bodyParser.urlencoded({ extended: true }));
+// pour transformer le corps de la requête en objet maintenable
 app.use(bodyParser.json());
 
 // pour la gestion de l'enregistrement des images
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-// pour l'utilisation des routes sauces et user
-// app.use("/api/sauces", sauceRoutes);
+// pour l'utilisation des routes
+app.use("/api/auth", userRoutes);
 
 module.exports = app;
