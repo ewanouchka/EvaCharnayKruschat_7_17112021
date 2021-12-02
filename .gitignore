@@ -4,4 +4,5 @@
 node_modules
 *.pptx
 premier*
+revoir_la_db
 backend/.env
