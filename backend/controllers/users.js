@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // import des models
-const models = require("../models");
+const models = require("../db/models");
 
 // import variables environnementales
 const dotEnv = require("dotenv");
@@ -39,13 +39,17 @@ exports.signup = (req, res, next) => {
             isAdmin: false,
           })
             .then((newUser) => {
+              console.log("res backend");
+              console.log({ userId: newUser.id });
               res.status(201).json({ userId: newUser.id });
             })
             .catch((err) => res.status(400).json({ error: "L'enregistrement de l'utilisateur a échoué." }));
         });
       } else {
         // s'il existe déjà, on renvoie un message d'erreur
-        return res.status(409).json({ error: "Cet utilisateur existe déjà !" });
+        console.log("res backend");
+        console.log({ error: "Cet e-mail est déjà utilisé !" });
+        return res.status(409).json({ error: "Cet e-mail est déjà utilisé !" });
       }
     })
     // si on ne parvient pas à vérifier la liste des emails enregistrés, on renvoie une erreur spécifique
