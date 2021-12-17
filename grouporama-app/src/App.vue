@@ -2,6 +2,7 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
+      <router-link to="/profile">Profile</router-link> |
       <router-link to="/about">About</router-link>
     </div>
     <router-view class="main-section"/>
@@ -13,13 +14,14 @@
 
 <script>
 export default {
-  name: 'App', 
-  
+  name: 'App',   
 	computed: {
 		copyright() {
 			const currentYear = new Date().getFullYear()
 			return `Groupomania©${currentYear}`
 		}
+  },
+  methods: {
   }
 }
 </script>
@@ -33,6 +35,7 @@ body {
   --color-primary:rgb(28, 28, 87);
   --color-secondary:rgb(247, 128, 128);
   --color-secondary-dark:rgb(226, 46, 46);
+--color-transparent:rgba(255, 255, 255, 0.95);
 --color-lighter:rgb(255,255,255);
 --color-light:rgb(199, 199, 199);
 --color-medium:rgb(128, 128, 128);
@@ -128,6 +131,38 @@ button {
     &:hover {color:var(--color-light); 
     box-shadow: 0 0 0.5rem var(--color-medium);
  }
+}
+
+.popup-container {
+  background: var(--color-transparent);
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+}
+
+.popup-bloc {
+  height: auto;
+  width: 35%;
+  background: var(--color-lighter);
+  border-radius: 3rem;
+  box-shadow: 0 0 0.5rem var(--color-primary);
+  font-family: var(--font-text);
+  text-align: center;
+  padding: 2rem;
+}
+
+.popup-bloc div{
+ font-weight:bold;
+}
+
+.popup-bloc p{
+ text-align: justify;
 }
 
 footer {
