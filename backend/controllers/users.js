@@ -12,16 +12,6 @@ const dbSecretToken = process.env.TOKEN_SECRET;
 
 // fonction enregistrer un nouvel utilisateur
 exports.signup = (req, res, next) => {
-  /* check si tous les champs sont remplis (peut-être voir dans le front ?)
-  if (
-    req.body.first_name == null ||
-    req.body.last_name == null ||
-    req.body.email == null ||
-    req.body.password == null
-  ) {
-    return res.status(400).json({ error: "Il manque des informations !" });
-  }*/
-
   // on vérifie que l'email de la requête est bien différent de ceux déjà présents dans la base de données
   models.User.findOne({
     attributes: ["email"],
@@ -39,16 +29,17 @@ exports.signup = (req, res, next) => {
             isAdmin: false,
           })
             .then((newUser) => {
-              console.log("res backend");
-              console.log({ userId: newUser.id });
-              res.status(201).json({ userId: newUser.id });
+              res.status(201).json({
+                userId: newUser.id,
+                token: jwt.sign({ userId: newUser.id, isAdmin: newUser.isAdmin }, dbSecretToken, {
+                  expiresIn: "24h",
+                }),
+              });
             })
             .catch((err) => res.status(400).json({ error: "L'enregistrement de l'utilisateur a échoué." }));
         });
       } else {
         // s'il existe déjà, on renvoie un message d'erreur
-        console.log("res backend");
-        console.log({ error: "Cet e-mail est déjà utilisé !" });
         return res.status(409).json({ error: "Cet e-mail est déjà utilisé !" });
       }
     })
@@ -58,12 +49,6 @@ exports.signup = (req, res, next) => {
 
 // fonction connexion d'un utilisateur
 exports.login = (req, res, next) => {
-  /* check si tous les champs sont remplis (peut-être voir dans le front ?)
-  if (req.body.email == null || req.body.password == null) {
-    console.log("champ vide");
-    return res.status(400).json({ error: "Il manque des informations !" });
-  }*/
-
   models.User.findOne({
     where: { email: req.body.email },
   })
