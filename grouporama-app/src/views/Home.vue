@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <img alt="logo above Groupomania" src="../assets/icon-above-font.svg" class="home__logo">
-    <Login/>
+    <section v-if="checkAuth === true">Profile<Profile /></section>
+    <section v-else>Login<Login/></section>
   </div>
 </template>
 
@@ -13,7 +14,17 @@ export default {
   name: 'Home',
   components: {
     Login
-  }
+  }, 
+  methods: {
+    checkAuth () {
+      // voir comment implémenter ici la vérification de l'authentification
+      try { console.log("fonction"); }
+      catch (error) { console.log(error);}
+      return false;
+    } 
+  }, beforeMount(){
+    this.checkAuth();
+ },
 }
 </script>
 
