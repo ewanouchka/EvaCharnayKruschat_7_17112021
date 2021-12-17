@@ -5,14 +5,14 @@
       <form id="login-form">
     <label for="Email" class="form-label">Votre e-mail : <span class="error-visible" id="error-message-Email"></span>
     </label>
-    <input placeholder="contact@groupomania.com" name="Email" id="Email" class="form-input" type="email" required pattern="^[a-zA-Z0-9]+[a-zA-Z\-\.\_]*@{1}[a-zA-Z0-9]+[\.]{1}[a-zA-Z]{2,}$">
+    <input placeholder="contact@groupomania.com" name="Email" id="Email" class="form-input" type="email" required pattern="^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$">
     <!-- oninput="checkValidity(this)" -->
     
-    <label for="Password" class="form-label">Votre mot de passe : <span class="error-visible" id="error-message-Email"></span>
+    <label for="Password" class="form-label">Votre mot de passe : <span class="error-visible" id="error-message-Password"></span>
     </label>
-    <input placeholder="123456AzErTy" name="Password" id="Password" class="form-input" type="text" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
+    <input placeholder="123456AzErTy" name="Password" id="Password" class="form-input" type="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$">
     
-    <button @click="loginSubmit" class="button" id="login-submit">Connexion</button>
+    <button @click.prevent="loginSubmit" class="button" id="login-submit">Connexion</button>
       <router-link to="/signup" class="create-account">Vous n'avez pas encore de compte ?</router-link>
     </form>
   </div>
@@ -21,7 +21,6 @@
 <script>
 export default {
   name: 'Login',
-
   methods: {
     loginSubmit () { 
       const inputValues = document.querySelectorAll(".form-input");
@@ -41,20 +40,72 @@ export default {
       };
       checkAllValidity();
 
+      const popupContainer = document.createElement("div");
+      const popupBloc = document.createElement("div");
+      popupContainer.setAttribute("id", "popup");
+      popupContainer.classList.add("popup-container");
+      popupBloc.classList.add("popup-bloc");
+      document.body.append(popupContainer);
+      popupContainer.append(popupBloc);
+
       if (checkAllValidity()) {
-        console.log("valide");
-        fetch("http://localhost:3000/api/auth/login", {
-          method: "POST",
-          body: JSON.stringify({ 
-            email: getInputValue("Email"),
-            password: getInputValue("Password"),
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        (async () => {
+          try { 
+            const loginSent = await fetch("http://localhost:3000/api/auth/login", {
+              method: "POST",
+              body: JSON.stringify({ 
+                email: getInputValue("Email"),
+                password: getInputValue("Password"),
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+          
+            const loginBacksent = await loginSent.json();
+
+            if (!loginBacksent.userId) {
+              popupBloc.innerHTML = `<div>Une erreur est survenue : ${loginBacksent.error}</div>
+              <button class="button" id="close-popup">Fermer</button>`;
+              document.querySelector("#close-popup").addEventListener("click", function () {
+                while (popupContainer.hasChildNodes()) {
+                  popupContainer.removeChild(popupContainer.firstChild);
+                }
+              document.body.removeChild(popupContainer);
+              });
+            } else {
+              popupBloc.innerHTML = `<div>Vous êtes maintenant connecté !</div>
+              <a href="../"><button class="button" id="close-popup">Fermer</button></a>`;
+              document.querySelector("#close-popup").addEventListener("click", function () {
+                while (popupContainer.hasChildNodes()) {
+                  popupContainer.removeChild(popupContainer.firstChild);
+                }
+                document.body.removeChild(popupContainer);
+              });
+            }
+          } catch (error) {
+          popupBloc.innerHTML = `<div>Une erreur est survenue : ${error}</div>
+              <button class="button" id="close-popup">Fermer</button>`;
+          document.querySelector("#close-popup").addEventListener("click", function () {
+            while (popupContainer.hasChildNodes()) {
+              popupContainer.removeChild(popupContainer.firstChild);
+            }
+            document.body.removeChild(popupContainer);
+          });
+          }
+        })();
       } else {
-        console.log("formulaire non valide");
+          popupBloc.innerHTML = `<div>Les informations saisies ne sont pas valides.</div>
+          <p>Assurez-vous que tous les champs sont correctement renseignés :</p>
+          <p>- L'email doit être valide.</p>
+          <p>- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).</p>
+          <button class="button" id="close-popup">Fermer</button>`;
+          document.querySelector("#close-popup").addEventListener("click", function () {
+            while (popupContainer.hasChildNodes()) {
+              popupContainer.removeChild(popupContainer.firstChild);
+            }
+            document.body.removeChild(popupContainer);
+          });
       }
     }
   }
