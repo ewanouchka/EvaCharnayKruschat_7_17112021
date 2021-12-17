@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <img alt="logo above Groupomania" src="../assets/icon-above-font.svg" class="home__logo">
-    <section v-if="checkAuth === true">Profile<Profile /></section>
-    <section v-else>Login<Login/></section>
+    <section v-if="checkAuth === true"><Profile /></section>
+    <section v-else><Login/></section>
   </div>
 </template>
 
