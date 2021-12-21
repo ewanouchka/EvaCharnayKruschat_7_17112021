@@ -29,7 +29,6 @@
   </div>
 </template>
 
-
 <script>
 export default {
   name: 'Signup',
@@ -92,6 +91,11 @@ export default {
           });
 
           } else {
+              const userAuth = {
+                userId: signupBacksent.userId,
+                token: signupBacksent.token,
+              };
+              localStorage.setItem("userAuth", JSON.stringify(userAuth));
           popupBloc.innerHTML = `<div>Utilisateur enregistré !</div>
           <a href="../"><button class="button" id="back-home">Retour à l'index</button></a>`;
           document.querySelector("#back-home").addEventListener("click", function () {
