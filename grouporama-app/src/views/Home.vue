@@ -1,30 +1,42 @@
 <template>
   <div class="home">
     <img alt="logo above Groupomania" src="../assets/icon-above-font.svg" class="home__logo">
-    <section v-if="checkAuth === true"><Profile /></section>
-    <section v-else><Login/></section>
+    <section v-if="isLoggedIn === false"><Login/></section>
+    <section v-else><Welcome /></section>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import Login from '@/components/Login.vue'
+import Welcome from '@/components/Welcome.vue'
 
 export default {
   name: 'Home',
   components: {
-    Login
+    Login, Welcome
   }, 
+  data: 
+    function() {
+      return {
+        isLoggedIn: 'false'
+      };
+    },
   methods: {
     checkAuth () {
-      // voir comment implémenter ici la vérification de l'authentification
-      try { console.log("fonction"); }
+      try { 
+        const verify = JSON.parse(localStorage.getItem("userAuth"));
+        if (!verify || verify.token == undefined) {
+          return this.isLoggedIn = false;
+        } else {
+          return this.isLoggedIn = true;
+        }
+      }
       catch (error) { console.log(error);}
-      return false;
     } 
   }, beforeMount(){
     this.checkAuth();
- },
+ }
 }
 </script>
 
