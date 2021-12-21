@@ -10,7 +10,7 @@
     
     <label for="Password" class="form-label">Votre mot de passe : <span class="error-visible" id="error-message-Password"></span>
     </label>
-    <input placeholder="123456AzErTy" name="Password" id="Password" class="form-input" type="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$">
+    <input placeholder="123456AzErTy*" name="Password" id="Password" class="form-input" type="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$">
     
     <button @click.prevent="loginSubmit" class="button" id="login-submit">Connexion</button>
       <router-link to="/signup" class="create-account">Vous n'avez pas encore de compte ?</router-link>
@@ -74,6 +74,11 @@ export default {
               document.body.removeChild(popupContainer);
               });
             } else {
+              const userAuth = {
+                userId: loginBacksent.userId,
+                token: loginBacksent.token,
+              };
+              localStorage.setItem("userAuth", JSON.stringify(userAuth));
               popupBloc.innerHTML = `<div>Vous êtes maintenant connecté !</div>
               <a href="../"><button class="button" id="close-popup">Fermer</button></a>`;
               document.querySelector("#close-popup").addEventListener("click", function () {
