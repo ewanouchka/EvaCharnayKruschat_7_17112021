@@ -133,38 +133,6 @@ button {
  }
 }
 
-.popup-container {
-  background: var(--color-transparent);
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 50;
-}
-
-.popup-bloc {
-  height: auto;
-  width: 35%;
-  background: var(--color-lighter);
-  border-radius: 3rem;
-  box-shadow: 0 0 0.5rem var(--color-primary);
-  font-family: var(--font-text);
-  text-align: center;
-  padding: 2rem;
-}
-
-.popup-bloc div{
- font-weight:bold;
-}
-
-.popup-bloc p{
- text-align: justify;
-}
-
 footer {
   width:100%;
     height:var(--footer-size);
