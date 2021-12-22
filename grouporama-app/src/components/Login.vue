@@ -15,12 +15,18 @@
     <button @click.prevent="loginSubmit" class="button" id="login-submit">Connexion</button>
       <router-link to="/signup" class="create-account">Vous n'avez pas encore de compte ?</router-link>
     </form>
+    <Popup />
   </div>
 </template>
 
 <script>
+import Popup from "@/components/Popup.vue"
+
 export default {
   name: 'Login',
+  components: {
+    Popup
+  },
   methods: {
     loginSubmit () { 
       const inputValues = document.querySelectorAll(".form-input");
@@ -40,13 +46,8 @@ export default {
       };
       checkAllValidity();
 
-      const popupContainer = document.createElement("div");
-      const popupBloc = document.createElement("div");
-      popupContainer.setAttribute("id", "popup");
-      popupContainer.classList.add("popup-container");
-      popupBloc.classList.add("popup-bloc");
-      document.body.append(popupContainer);
-      popupContainer.append(popupBloc);
+      const popupContainer = document.querySelector(".popup-container");
+      const popupBloc = document.querySelector(".popup-bloc");
 
       if (checkAllValidity()) {
         (async () => {
@@ -65,13 +66,11 @@ export default {
             const loginBacksent = await loginSent.json();
 
             if (!loginBacksent.userId) {
+              popupContainer.classList.add("popup-container-visible");
               popupBloc.innerHTML = `<div>Une erreur est survenue : ${loginBacksent.error}</div>
               <button class="button" id="close-popup">Fermer</button>`;
-              document.querySelector("#close-popup").addEventListener("click", function () {
-                while (popupContainer.hasChildNodes()) {
-                  popupContainer.removeChild(popupContainer.firstChild);
-                }
-              document.body.removeChild(popupContainer);
+              document.querySelector("#close-popup").addEventListener("click", function () {         
+              popupContainer.classList.remove("popup-container-visible");
               });
             } else {
               const userAuth = {
@@ -79,37 +78,31 @@ export default {
                 token: loginBacksent.token,
               };
               localStorage.setItem("userAuth", JSON.stringify(userAuth));
+              popupContainer.classList.add("popup-container-visible");
               popupBloc.innerHTML = `<div>Vous êtes maintenant connecté !</div>
               <a href="../"><button class="button" id="close-popup">Fermer</button></a>`;
-              document.querySelector("#close-popup").addEventListener("click", function () {
-                while (popupContainer.hasChildNodes()) {
-                  popupContainer.removeChild(popupContainer.firstChild);
-                }
-                document.body.removeChild(popupContainer);
+              document.querySelector("#close-popup").addEventListener("click", function () {         
+              popupContainer.classList.remove("popup-container-visible");
               });
             }
           } catch (error) {
+              popupContainer.classList.add("popup-container-visible");
           popupBloc.innerHTML = `<div>Une erreur est survenue : ${error}</div>
               <button class="button" id="close-popup">Fermer</button>`;
-          document.querySelector("#close-popup").addEventListener("click", function () {
-            while (popupContainer.hasChildNodes()) {
-              popupContainer.removeChild(popupContainer.firstChild);
-            }
-            document.body.removeChild(popupContainer);
+          document.querySelector("#close-popup").addEventListener("click", function () {         
+              popupContainer.classList.remove("popup-container-visible");
           });
           }
         })();
       } else {
+              popupContainer.classList.add("popup-container-visible");
           popupBloc.innerHTML = `<div>Les informations saisies ne sont pas valides.</div>
           <p>Assurez-vous que tous les champs sont correctement renseignés :</p>
           <p>- L'email doit être valide.</p>
           <p>- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).</p>
           <button class="button" id="close-popup">Fermer</button>`;
-          document.querySelector("#close-popup").addEventListener("click", function () {
-            while (popupContainer.hasChildNodes()) {
-              popupContainer.removeChild(popupContainer.firstChild);
-            }
-            document.body.removeChild(popupContainer);
+          document.querySelector("#close-popup").addEventListener("click", function () {            
+              popupContainer.classList.remove("popup-container-visible");
           });
       }
     }
