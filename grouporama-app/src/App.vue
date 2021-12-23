@@ -1,20 +1,29 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/profile">Profile</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
+    <nav id="nav">
+      <div class="nav-links">
+        <router-link to="/">Home</router-link> |
+        <router-link to="/profile">Profile</router-link> |
+        <router-link to="/about">About</router-link> 
+      </div>
+      <button @click.prevent="logOut" class="nav-button">Se déconnecter</button>
+    </nav>
     <router-view class="main-section"/>
     <footer>
       {{ copyright }}
       </footer>
+    <Popup />
   </div>
 </template>
 
 <script>
+import Popup from "@/components/Popup.vue";
+
 export default {
   name: 'App',   
+  components: {
+    Popup,
+  },
 	computed: {
 		copyright() {
 			const currentYear = new Date().getFullYear()
@@ -22,6 +31,23 @@ export default {
 		}
   },
   methods: {
+    changeMessage(newMessage, newDetail) {
+      const popupMessage = document.querySelector(".popup-bloc__msg");
+      const popupDetail = document.querySelector(".popup-bloc__detail");
+      popupMessage.innerHTML = newMessage;
+      popupDetail.innerHTML = newDetail;
+    },
+    logOut() {
+              localStorage.removeItem("userAuth");
+      const popupContainer = document.querySelector(".popup-container");
+              popupContainer.classList.add("popup-container-visible");
+              this.changeMessage("Vous êtes bien déconnecté !", "");
+              document.querySelector("#close-popup").addEventListener("click", function () {
+                popupContainer.classList.remove("popup-container-visible");
+                window.location.reload();
+              });
+
+    }
   }
 }
 </script>
@@ -46,7 +72,7 @@ body {
 --font-size:16px;
 --padding-top-bottom:1rem;
 --footer-size:1.25rem;
---header-size:1.5rem;
+--header-size:2rem;
 }
 
  a {
@@ -71,13 +97,31 @@ body {
   flex-wrap: wrap;
 }
 
+button {
+  margin:1rem;
+  border:none;
+  border-radius: 2rem;
+  background:linear-gradient(-165deg, var(--color-lighter), var(--color-secondary) 25%,var(--color-secondary-dark) 60%, var(--color-secondary-dark));
+  box-shadow: 0 0 0.5rem var(--color-light);
+  height:2rem;
+  padding:0 1rem;
+  color:var(--color-lighter);
+  font-weight:bold;
+  transition: all 0.3s ease-in-out;
+
+    &:hover {color:var(--color-light); 
+    box-shadow: 0 0 0.5rem var(--color-medium);
+ }
+}
+
 #nav {
   width:100%;
   background: var(--color-primary);
   height:var(--header-size);
   padding:var(--padding-top-bottom);
-    color: var(--color-light);
-
+  color: var(--color-light);
+  display: flex;
+  justify-content: space-around;
 
   a {
     font-weight: bold;
@@ -94,9 +138,18 @@ body {
   }
 }
 
+.nav-links {
+  align-self: center;
+}
+
+.nav-button {
+  margin: 0 1rem;
+}
+
 .main-section {
   height: calc(100vh - var(--header-size) - var(--footer-size) - 4 * var(--padding-top-bottom));
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .form-label{
@@ -114,23 +167,6 @@ body {
     border:1px solid var(--color-primary);
     outline: transparent auto 0px;
     }
-}
-
-button {
-  margin:1rem;
-  border:none;
-  border-radius: 2rem;
-  background:linear-gradient(-165deg, var(--color-lighter), var(--color-secondary) 25%,var(--color-secondary-dark) 60%, var(--color-secondary-dark));
-  box-shadow: 0 0 0.5rem var(--color-light);
-  height:2rem;
-  padding:0 1rem;
-  color:var(--color-lighter);
-  font-weight:bold;
-  transition: all 0.3s ease-in-out;
-
-    &:hover {color:var(--color-light); 
-    box-shadow: 0 0 0.5rem var(--color-medium);
- }
 }
 
 footer {
