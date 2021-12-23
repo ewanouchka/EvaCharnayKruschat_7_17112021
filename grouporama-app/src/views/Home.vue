@@ -47,16 +47,31 @@ export default {
   object-fit: cover;
   }
 
+@media all and (min-width: 426px) and (max-width: 767px) {
+.home__logo {
+  width:400px;
+  height:15rem;
+  }
+}
+
+@media all and (min-height: 641px) and (max-height: 823px) {
+.home__logo {
+  width:400px;
+  height:15rem;
+  }
+}
+
 @media all and (max-width: 425px) {
 .home__logo {
   width:270px;
   height:9rem;
   }
 }
-@media all and (min-width: 426px) and (max-width: 768px) {
+
+@media all and (max-height: 640px) {
 .home__logo {
-  width:400px;
-  height:15rem;
+  width:270px;
+  height:9rem;
   }
 }
 
