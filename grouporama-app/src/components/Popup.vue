@@ -1,10 +1,11 @@
 <template>
   <div class="popup-container" id="popup">
     <div class="popup-bloc">
-    <div>{{ msg }}</div>
-    <p>
+    <div class="popup-bloc__msg">{{ msg }}</div>
+    <div class="popup-bloc__detail">
       {{ detail }}
-    </p>
+    </div>
+    <button class="button" id="close-popup">Fermer</button>
     </div>
   </div>
 </template>
@@ -12,17 +13,13 @@
 <script>
 export default {
   name: 'Popup',
-  /*props: {
-    msg: String
-  },*/
-
   data: 
     function() {
       return {
-        msg: "Information principale",
-        detail: "Détail",
+        msg: "Aïe aïe aïe",
+        detail: "Le popup est vide",
       };
-    },
+  },
 }
 </script>
 
@@ -62,5 +59,6 @@ export default {
 
 .popup-bloc p{
  text-align: justify;
+ font-weight:normal;
 }
 </style>
