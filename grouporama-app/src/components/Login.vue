@@ -33,7 +33,7 @@
       <button @click.prevent="loginSubmit" class="button" id="login-submit">Connexion</button>
       <router-link to="/signup" class="create-account">Vous n'avez pas encore de compte ?</router-link>
     </form>
-    <Popup />
+    <Popup v-show="isPopupVisible" :msg="msg" :detail="detail" />
   </div>
 </template>
 
@@ -45,13 +45,25 @@ export default {
   components: {
     Popup,
   },
+  data() {
+      return {
+        isPopupVisible: false,
+        msg: "message de base",
+        detail: "detail de base",
+      };
+    },
   methods: {
-    changeMessage(newMessage, newDetail) {
+    showPopup(newMessage, newDetail) {
+        this.isPopupVisible = true;
+        this.msg = newMessage;
+        this.detail = newDetail;
+      },
+    /*changeMessage(newMessage, newDetail) {
       const popupMessage = document.querySelector(".popup-bloc__msg");
       const popupDetail = document.querySelector(".popup-bloc__detail");
       popupMessage.innerHTML = newMessage;
       popupDetail.innerHTML = newDetail;
-    },
+    },*/
     loginSubmit() {
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
@@ -89,8 +101,9 @@ export default {
             const loginBacksent = await loginSent.json();
 
             if (!loginBacksent.userId) {
-              popupContainer.classList.add("popup-container-visible");
-              this.changeMessage("Une erreur est survenue :", `${loginBacksent.error}`);
+
+              /*popupContainer.classList.add("popup-container-visible");*/
+              /*this.changeMessage("Une erreur est survenue :", `${loginBacksent.error}`);*/
               document.querySelector("#close-popup").addEventListener("click", function () {
                 popupContainer.classList.remove("popup-container-visible");
               });
@@ -101,24 +114,24 @@ export default {
               };
               localStorage.setItem("userAuth", JSON.stringify(userAuth));
 
-              popupContainer.classList.add("popup-container-visible");
-              this.changeMessage("Vous êtes maintenant connecté !", "");
+              /*popupContainer.classList.add("popup-container-visible");
+              this.changeMessage("Vous êtes maintenant connecté !", "");*/
               document.querySelector("#close-popup").addEventListener("click", function () {
                 popupContainer.classList.remove("popup-container-visible");
                 window.location.reload();
               });
             }
           } catch (error) {
-            popupContainer.classList.add("popup-container-visible");
-            this.changeMessage("Une erreur est survenue :", `${error}`);
+            /*popupContainer.classList.add("popup-container-visible");
+            this.changeMessage("Une erreur est survenue :", `${error}`);*/
             document.querySelector("#close-popup").addEventListener("click", function () {
               popupContainer.classList.remove("popup-container-visible");
             });
           }
         })();
       } else {
-        popupContainer.classList.add("popup-container-visible");
-        this.changeMessage(
+        /*popupContainer.classList.add("popup-container-visible");*/
+        this.showPopup(
           "Les informations saisies ne sont pas valides.",
           `<p>Assurez-vous que tous les champs sont correctement renseignés :</p>
           <p>- L'email doit être valide.</p>

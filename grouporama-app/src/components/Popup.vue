@@ -13,13 +13,7 @@
 <script>
 export default {
   name: 'Popup',
-  data: 
-    function() {
-      return {
-        msg: "Aïe aïe aïe",
-        detail: "Le popup est vide",
-      };
-  },
+  props: ['msg', 'detail'],
 }
 </script>
 
@@ -29,7 +23,7 @@ export default {
   background: var(--color-transparent);
   width: 100vw;
   height: 100vh;
-  display: none;
+  display: flex;
   justify-content: center;
   align-items: center;
   position: fixed;
