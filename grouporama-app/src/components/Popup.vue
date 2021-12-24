@@ -31,10 +31,10 @@ export default {
   left: 0;
   z-index: 50;
 }
-
+/*
 .popup-container-visible {
   display:flex;
-}
+}*/
 
 .popup-bloc {
   height: auto;
