@@ -6,11 +6,11 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 
 // on récupère les fonctions dans les controllers > users
-const userCtrl = require("../controllers/users");
+const profileCtrl = require("../controllers/profiles");
 
 // on crée les routes
-router.post("/signup", userCtrl.signup);
-router.post("/login", userCtrl.login);
-router.delete("/", auth, userCtrl.deleteUser); // à revoir
+router.get("/", auth, profileCtrl.getUserProfile); // à revoir
+router.put("/", auth, profileCtrl.updateUserProfile); // à revoir
+router.delete("/", auth, profileCtrl.deleteUserProfile); // à revoir
 
 module.exports = router;

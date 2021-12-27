@@ -5,13 +5,12 @@ const path = require("path");
 
 // import des routes
 const userRoutes = require("./routes/users.js");
+const profileRoutes = require("./routes/profiles.js");
 
 // import des variables environnementales
 const dotEnv = require("dotenv");
 dotEnv.config();
 // const dbUsername = process.env.DATABASE_USERNAME;
-
-// connection à la base de données MySQL
 
 // on initialise express
 const app = express();
@@ -38,5 +37,6 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 // pour l'utilisation des routes
 app.use("/api/auth", userRoutes);
+app.use("/api/profile", profileRoutes);
 
 module.exports = app;
