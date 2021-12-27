@@ -4,7 +4,8 @@
     <p>Connectez-vous à votre compte utilisateur</p>
     <form id="login-form">
       <label for="Email" class="form-label"
-        >Votre e-mail : <span class="error-visible" id="error-message-Email"></span>
+        >Votre e-mail :
+        <span class="error-visible" id="error-message-Email"></span>
       </label>
       <input
         placeholder="contact@groupomania.com"
@@ -18,7 +19,8 @@
       <!-- oninput="checkValidity(this)" -->
 
       <label for="Password" class="form-label"
-        >Votre mot de passe : <span class="error-visible" id="error-message-Password"></span>
+        >Votre mot de passe :
+        <span class="error-visible" id="error-message-Password"></span>
       </label>
       <input
         placeholder="123456AzErTy*"
@@ -30,10 +32,19 @@
         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
       />
 
-      <button @click.prevent="loginSubmit" class="button" id="login-submit">Connexion</button>
-      <router-link to="/signup" class="create-account">Vous n'avez pas encore de compte ?</router-link>
+      <button @click.prevent="loginSubmit" class="button" id="login-submit">
+        Connexion
+      </button>
+      <router-link to="/signup" class="create-account"
+        >Vous n'avez pas encore de compte ?</router-link
+      >
     </form>
-    <Popup v-if="isPopupVisible === true" @close="closePopup" :msg="msg" :detail="detail" />
+    <Popup
+      v-if="isPopupVisible === true"
+      @close="closePopup"
+      :msg="msg"
+      :detail="detail"
+    />
   </div>
 </template>
 
@@ -46,24 +57,24 @@ export default {
     Popup,
   },
   data() {
-      return {
-        isPopupVisible: false,
-        msg: "message de base",
-        detail: "detail de base",
-      };
-    },
+    return {
+      isPopupVisible: false,
+      msg: "message de base",
+      detail: "detail de base",
+    };
+  },
   methods: {
     showPopup(newMessage, newDetail) {
-        this.isPopupVisible = true;
-        this.msg = newMessage;
-        this.detail = newDetail;
-      },
-closePopup() {
-        this.isPopupVisible = false;
-        if(localStorage.getItem("userAuth")) {
-              window.location.reload();
-        }
-      },
+      this.isPopupVisible = true;
+      this.msg = newMessage;
+      this.detail = newDetail;
+    },
+    closePopup() {
+      this.isPopupVisible = false;
+      if (localStorage.getItem("userAuth")) {
+        window.location.reload();
+      }
+    },
     loginSubmit() {
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
@@ -85,21 +96,27 @@ closePopup() {
       if (checkAllValidity()) {
         (async () => {
           try {
-            const loginSent = await fetch("http://localhost:3000/api/auth/login", {
-              method: "POST",
-              body: JSON.stringify({
-                email: getInputValue("Email"),
-                password: getInputValue("Password"),
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+            const loginSent = await fetch(
+              "http://localhost:3000/api/auth/login",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  email: getInputValue("Email"),
+                  password: getInputValue("Password"),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
             const loginBacksent = await loginSent.json();
 
             if (!loginBacksent.userId) {
-              this.showPopup("Une erreur est survenue :", `${loginBacksent.error}`);
+              this.showPopup(
+                "Une erreur est survenue :",
+                `${loginBacksent.error}`
+              );
             } else {
               const userAuth = {
                 userId: loginBacksent.userId,
@@ -107,9 +124,10 @@ closePopup() {
               };
               localStorage.setItem("userAuth", JSON.stringify(userAuth));
 
-        this.showPopup("Vous êtes maintenant connecté !", "");
+              this.showPopup("Vous êtes maintenant connecté !", "");
             }
-          } catch (error) {this.showPopup("Une erreur est survenue :", `${error}`);
+          } catch (error) {
+            this.showPopup("Une erreur est survenue :", `${error}`);
           }
         })();
       } else {
