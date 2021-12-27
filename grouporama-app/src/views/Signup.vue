@@ -1,6 +1,10 @@
 <template>
   <div class="signup">
-    <img alt="logo above Groupomania" src="../assets/icon-above-font.svg" class="home__logo" />
+    <img
+      alt="logo above Groupomania"
+      src="../assets/icon-above-font.svg"
+      class="home__logo"
+    />
     <h1>Enregistrez votre compte utilisateur</h1>
     <p>Veuillez remplir tous les champs</p>
     <form id="signup-form">
@@ -17,7 +21,8 @@
       <span class="error-visible" id="error-message-Name"></span>
 
       <label for="Prénom" class="form-label"
-        >Votre prénom : <span class="error-visible" id="error-message-Surname"></span>
+        >Votre prénom :
+        <span class="error-visible" id="error-message-Surname"></span>
       </label>
       <input
         placeholder="Dominique"
@@ -30,7 +35,8 @@
       />
 
       <label for="Email" class="form-label"
-        >Votre e-mail : <span class="error-visible" id="error-message-Email"></span>
+        >Votre e-mail :
+        <span class="error-visible" id="error-message-Email"></span>
       </label>
       <input
         placeholder="contact@groupomania.com"
@@ -44,7 +50,8 @@
 
       <!-- oninput="checkValidity(this)" -->
       <label for="Password" class="form-label"
-        >Votre mot de passe : <span class="error-visible" id="error-message-Password"></span>
+        >Votre mot de passe :
+        <span class="error-visible" id="error-message-Password"></span>
       </label>
       <input
         placeholder="123456AzErTy*"
@@ -57,7 +64,8 @@
       />
 
       <label for="RepeatPassword" class="form-label"
-        >Répétez votre mot de passe : <span class="error-visible" id="error-message-Repeat-Password"></span>
+        >Répétez votre mot de passe :
+        <span class="error-visible" id="error-message-Repeat-Password"></span>
       </label>
       <input
         placeholder="123456AzErTy*"
@@ -69,9 +77,16 @@
         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
       />
 
-      <button @click.prevent="signupSubmit" class="button" id="signup-submit">S'enregistrer</button>
+      <button @click.prevent="signupSubmit" class="button" id="signup-submit">
+        S'enregistrer
+      </button>
     </form>
-    <Popup v-if="isPopupVisible === true" @close="closePopup" :msg="msg" :detail="detail" />
+    <Popup
+      v-if="isPopupVisible === true"
+      @close="closePopup"
+      :msg="msg"
+      :detail="detail"
+    />
   </div>
 </template>
 
@@ -84,24 +99,24 @@ export default {
     Popup,
   },
   data() {
-      return {
-        isPopupVisible: false,
-        msg: "message de base",
-        detail: "detail de base",
-      };
-    },
+    return {
+      isPopupVisible: false,
+      msg: "message de base",
+      detail: "detail de base",
+    };
+  },
   methods: {
     showPopup(newMessage, newDetail) {
-        this.isPopupVisible = true;
-        this.msg = newMessage;
-        this.detail = newDetail;
-      },
-closePopup() {
-        this.isPopupVisible = false;
-        if(localStorage.getItem("userAuth")) {
-              window.location = "../" ;
-        }
-      },
+      this.isPopupVisible = true;
+      this.msg = newMessage;
+      this.detail = newDetail;
+    },
+    closePopup() {
+      this.isPopupVisible = false;
+      if (localStorage.getItem("userAuth")) {
+        window.location = "../";
+      }
+    },
     signupSubmit() {
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
@@ -126,23 +141,29 @@ closePopup() {
       if (checkAllValidity()) {
         (async () => {
           try {
-            const signupSent = await fetch("http://localhost:3000/api/auth/signup", {
-              method: "POST",
-              body: JSON.stringify({
-                first_name: getInputValue("Surname"),
-                last_name: getInputValue("Name"),
-                email: getInputValue("Email"),
-                password: getInputValue("Password"),
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
+            const signupSent = await fetch(
+              "http://localhost:3000/api/auth/signup",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  first_name: getInputValue("Surname"),
+                  last_name: getInputValue("Name"),
+                  email: getInputValue("Email"),
+                  password: getInputValue("Password"),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
 
             const signupBacksent = await signupSent.json();
 
             if (!signupBacksent.userId) {
-              this.showPopup("Une erreur est survenue :", `${signupBacksent.error}`);
+              this.showPopup(
+                "Une erreur est survenue :",
+                `${signupBacksent.error}`
+              );
             } else {
               const userAuth = {
                 userId: signupBacksent.userId,
@@ -153,12 +174,17 @@ closePopup() {
               this.showPopup("Utilisateur enregistré !", "");
             }
           } catch (error) {
-              this.showPopup("Impossible d'enregistrer cet utilisateur.", "Il est possible que le serveur rencontre des difficultés, ou bien cet e-mail est déjà enregistré. Veuillez vérifier votre saisie et renouveler votre demande.");
-            }
+            this.showPopup(
+              "Impossible d'enregistrer cet utilisateur.",
+              "Il est possible que le serveur rencontre des difficultés, ou bien cet e-mail est déjà enregistré. Veuillez vérifier votre saisie et renouveler votre demande."
+            );
+          }
         })();
       } else {
-        this.showPopup("Les informations saisies ne sont pas valides.", 
-        "Assurez-vous que tous les champs sont correctement renseignés :\n- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe ressaisi doit être identique au premier.");
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "Assurez-vous que tous les champs sont correctement renseignés :\n- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe ressaisi doit être identique au premier."
+        );
       }
     },
   },
@@ -182,30 +208,30 @@ closePopup() {
 }
 
 @media all and (min-width: 426px) and (max-width: 767px) {
-.home__logo {
-  width:400px;
-  height:15rem;
+  .home__logo {
+    width: 400px;
+    height: 15rem;
   }
 }
 
 @media all and (min-height: 641px) and (max-height: 823px) {
-.home__logo {
-  width:400px;
-  height:15rem;
+  .home__logo {
+    width: 400px;
+    height: 15rem;
   }
 }
 
 @media all and (max-width: 425px) {
-.home__logo {
-  width:270px;
-  height:9rem;
+  .home__logo {
+    width: 270px;
+    height: 9rem;
   }
 }
 
 @media all and (max-height: 640px) {
-.home__logo {
-  width:270px;
-  height:9rem;
+  .home__logo {
+    width: 270px;
+    height: 9rem;
   }
 }
 </style>
