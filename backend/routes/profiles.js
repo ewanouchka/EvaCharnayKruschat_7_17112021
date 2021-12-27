@@ -9,7 +9,7 @@ const auth = require("../middleware/auth");
 const profileCtrl = require("../controllers/profiles");
 
 // on crée les routes
-router.get("/", auth, profileCtrl.getUserProfile); // à revoir
+router.post("/", auth, profileCtrl.getUserProfile); // à revoir
 router.put("/", auth, profileCtrl.updateUserProfile); // à revoir
 router.delete("/", auth, profileCtrl.deleteUserProfile); // à revoir
 
