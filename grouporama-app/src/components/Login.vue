@@ -33,7 +33,7 @@
       <button @click.prevent="loginSubmit" class="button" id="login-submit">Connexion</button>
       <router-link to="/signup" class="create-account">Vous n'avez pas encore de compte ?</router-link>
     </form>
-    <Popup v-show="isPopupVisible" :msg="msg" :detail="detail" />
+    <Popup v-if="isPopupVisible === true" @close="closePopup" :msg="msg" :detail="detail" />
   </div>
 </template>
 
@@ -58,12 +58,12 @@ export default {
         this.msg = newMessage;
         this.detail = newDetail;
       },
-    /*changeMessage(newMessage, newDetail) {
-      const popupMessage = document.querySelector(".popup-bloc__msg");
-      const popupDetail = document.querySelector(".popup-bloc__detail");
-      popupMessage.innerHTML = newMessage;
-      popupDetail.innerHTML = newDetail;
-    },*/
+closePopup() {
+        this.isPopupVisible = false;
+        if(localStorage.getItem("userAuth")) {
+              window.location.reload();
+        }
+      },
     loginSubmit() {
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
@@ -82,8 +82,6 @@ export default {
       };
       checkAllValidity();
 
-      const popupContainer = document.querySelector(".popup-container");
-
       if (checkAllValidity()) {
         (async () => {
           try {
@@ -101,12 +99,7 @@ export default {
             const loginBacksent = await loginSent.json();
 
             if (!loginBacksent.userId) {
-
-              /*popupContainer.classList.add("popup-container-visible");*/
-              /*this.changeMessage("Une erreur est survenue :", `${loginBacksent.error}`);*/
-              document.querySelector("#close-popup").addEventListener("click", function () {
-                popupContainer.classList.remove("popup-container-visible");
-              });
+              this.showPopup("Une erreur est survenue :", `${loginBacksent.error}`);
             } else {
               const userAuth = {
                 userId: loginBacksent.userId,
@@ -114,32 +107,16 @@ export default {
               };
               localStorage.setItem("userAuth", JSON.stringify(userAuth));
 
-              /*popupContainer.classList.add("popup-container-visible");
-              this.changeMessage("Vous êtes maintenant connecté !", "");*/
-              document.querySelector("#close-popup").addEventListener("click", function () {
-                popupContainer.classList.remove("popup-container-visible");
-                window.location.reload();
-              });
+        this.showPopup("Vous êtes maintenant connecté !", "");
             }
-          } catch (error) {
-            /*popupContainer.classList.add("popup-container-visible");
-            this.changeMessage("Une erreur est survenue :", `${error}`);*/
-            document.querySelector("#close-popup").addEventListener("click", function () {
-              popupContainer.classList.remove("popup-container-visible");
-            });
+          } catch (error) {this.showPopup("Une erreur est survenue :", `${error}`);
           }
         })();
       } else {
-        /*popupContainer.classList.add("popup-container-visible");*/
         this.showPopup(
           "Les informations saisies ne sont pas valides.",
-          `<p>Assurez-vous que tous les champs sont correctement renseignés :</p>
-          <p>- L'email doit être valide.</p>
-          <p>- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).</p>`
+          `Assurez-vous que tous les champs sont correctement renseignés :\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).`
         );
-        document.querySelector("#close-popup").addEventListener("click", function () {
-          popupContainer.classList.remove("popup-container-visible");
-        });
       }
     },
   },

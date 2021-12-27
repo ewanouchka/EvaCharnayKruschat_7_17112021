@@ -71,7 +71,7 @@
 
       <button @click.prevent="signupSubmit" class="button" id="signup-submit">S'enregistrer</button>
     </form>
-    <Popup />
+    <Popup v-if="isPopupVisible === true" @close="closePopup" :msg="msg" :detail="detail" />
   </div>
 </template>
 
@@ -83,13 +83,25 @@ export default {
   components: {
     Popup,
   },
-  methods: {
-    changeMessage(newMessage, newDetail) {
-      const popupMessage = document.querySelector(".popup-bloc__msg");
-      const popupDetail = document.querySelector(".popup-bloc__detail");
-      popupMessage.innerHTML = newMessage;
-      popupDetail.innerHTML = newDetail;
+  data() {
+      return {
+        isPopupVisible: false,
+        msg: "message de base",
+        detail: "detail de base",
+      };
     },
+  methods: {
+    showPopup(newMessage, newDetail) {
+        this.isPopupVisible = true;
+        this.msg = newMessage;
+        this.detail = newDetail;
+      },
+closePopup() {
+        this.isPopupVisible = false;
+        if(localStorage.getItem("userAuth")) {
+              window.location = "../" ;
+        }
+      },
     signupSubmit() {
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
@@ -111,8 +123,6 @@ export default {
       };
       checkAllValidity();
 
-      const popupContainer = document.querySelector(".popup-container");
-
       if (checkAllValidity()) {
         (async () => {
           try {
@@ -132,11 +142,7 @@ export default {
             const signupBacksent = await signupSent.json();
 
             if (!signupBacksent.userId) {
-              popupContainer.classList.add("popup-container-visible");
-              this.changeMessage("Une erreur est survenue :", `${signupBacksent.error}`);
-              document.querySelector("#close-popup").addEventListener("click", function () {
-                popupContainer.classList.remove("popup-container-visible");
-              });
+              this.showPopup("Une erreur est survenue :", `${signupBacksent.error}`);
             } else {
               const userAuth = {
                 userId: signupBacksent.userId,
@@ -144,37 +150,15 @@ export default {
               };
               localStorage.setItem("userAuth", JSON.stringify(userAuth));
 
-              popupContainer.classList.add("popup-container-visible");
-              this.changeMessage("Utilisateur enregistré !", "");
-              document.querySelector("#close-popup").addEventListener("click", function () {
-                popupContainer.classList.remove("popup-container-visible");
-                window.location = "../";
-              });
+              this.showPopup("Utilisateur enregistré !", "");
             }
           } catch (error) {
-            popupContainer.classList.add("popup-container-visible");
-            this.changeMessage(
-              "Impossible d'enregistrer cet utilisateur.",
-              `<p>Il est possible que le serveur rencontre des difficultés, ou bien cet e-mail est déjà enregistré. Veuillez vérifier votre saisie et renouveler votre demande.</p>`
-            );
-            document.querySelector("#close-popup").addEventListener("click", function () {
-              popupContainer.classList.remove("popup-container-visible");
-            });
-          }
+              this.showPopup("Impossible d'enregistrer cet utilisateur.", "Il est possible que le serveur rencontre des difficultés, ou bien cet e-mail est déjà enregistré. Veuillez vérifier votre saisie et renouveler votre demande.");
+            }
         })();
       } else {
-        popupContainer.classList.add("popup-container-visible");
-        this.changeMessage(
-          "Les informations saisies ne sont pas valides.",
-          `<p>Assurez-vous que tous les champs sont correctement renseignés :</p>
-          <p>- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.</p>
-          <p>- L'email doit être valide.</p>
-          <p>- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).</p>
-          <p>- Le mot de passe ressaisi doit être identique au premier.</p>`
-        );
-        document.querySelector("#close-popup").addEventListener("click", function () {
-          popupContainer.classList.remove("popup-container-visible");
-        });
+        this.showPopup("Les informations saisies ne sont pas valides.", 
+        "Assurez-vous que tous les champs sont correctement renseignés :\n- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe ressaisi doit être identique au premier.");
       }
     },
   },

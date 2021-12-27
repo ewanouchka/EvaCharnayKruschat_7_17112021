@@ -2,10 +2,8 @@
   <div class="popup-container" id="popup">
     <div class="popup-bloc">
     <div class="popup-bloc__msg">{{ msg }}</div>
-    <div class="popup-bloc__detail">
-      {{ detail }}
-    </div>
-    <button class="button" id="close-popup">Fermer</button>
+    <pre class="popup-bloc__detail">{{ detail }}</pre>
+    <button class="button close" @click="$emit('close')" id="close-popup">Fermer</button>
     </div>
   </div>
 </template>
@@ -26,19 +24,15 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed;
+  position:absolute;
   top: 0;
   left: 0;
   z-index: 50;
 }
-/*
-.popup-container-visible {
-  display:flex;
-}*/
 
 .popup-bloc {
   height: auto;
-  width: 35%;
+  width: 280px;
   background: var(--color-lighter);
   border-radius: 3rem;
   box-shadow: 0 0 0.5rem var(--color-primary);
@@ -47,12 +41,15 @@ export default {
   padding: 2rem;
 }
 
-.popup-bloc div{
+.popup-bloc__msg{
  font-weight:bold;
 }
 
-.popup-bloc p{
+.popup-bloc__detail, pre{
  text-align: justify;
  font-weight:normal;
+ font-family: inherit;
+ width:100%;
+ white-space:pre-wrap;
 }
 </style>
