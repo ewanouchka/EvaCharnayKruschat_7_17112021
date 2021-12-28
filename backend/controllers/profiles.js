@@ -12,9 +12,7 @@ const dbSecretToken = process.env.TOKEN_SECRET;
 
 // fonction accès au profil utilisateur
 exports.getUserProfile = (req, res, next) => {
-  console.log("je lance la fonction get User Profile");
   const headerAuth = req.headers["authorization"];
-  console.log(headerAuth);
   let userToken = "";
 
   if (headerAuth != null) {
@@ -26,7 +24,6 @@ exports.getUserProfile = (req, res, next) => {
 
     if (userToken != null) {
       try {
-        console.log("je vérifie le token et récupère le userID");
         const jwtTokenInfo = jwt.verify(userToken, dbSecretToken);
         if (jwtTokenInfo != null) {
           userId = jwtTokenInfo.userId;
@@ -41,21 +38,16 @@ exports.getUserProfile = (req, res, next) => {
   const userId = getUserId(userToken);
 
   if (userId < 0) {
-    console.log("le token n'est pas bon donc pas de userID");
     return res.status(400).json({ error: "token non reconnu" });
   } else {
-    console.log("je recherche mon user");
     models.User.findOne({
       attributes: ["id", "email", "first_name", "last_name"],
       where: { id: userId },
     })
       .then(function (user) {
-        console.log("then...");
         if (user) {
-          console.log("je retourne mon user");
           res.status(201).json(user);
         } else {
-          console.log("je n'ai pas mon user");
           res.status(404).json({ error: "utilisateur inconnu" });
         }
       })
@@ -66,7 +58,62 @@ exports.getUserProfile = (req, res, next) => {
 };
 
 // fonction modification du profil utilisateur
-exports.updateUserProfile = (req, res, next) => {};
+exports.updateUserProfile = (req, res, next) => {
+  const headerAuth = req.headers["authorization"];
+  let userToken = "";
+
+  if (headerAuth != null) {
+    userToken = headerAuth.replace("Bearer ", "");
+  }
+
+  const getUserId = () => {
+    let userId = -1;
+
+    if (userToken != null) {
+      try {
+        const jwtTokenInfo = jwt.verify(userToken, dbSecretToken);
+        if (jwtTokenInfo != null) {
+          userId = jwtTokenInfo.userId;
+        }
+      } catch (error) {
+        res.status(500).json({ error: "l'id utilisateur n'a pas pu être récupéré" });
+      }
+    }
+    return userId;
+  };
+
+  const userId = getUserId(userToken);
+
+  if (userId < 0) {
+    return res.status(400).json({ error: "token non reconnu" });
+  } else {
+    models.User.findOne({
+      attributes: ["id", "email", "first_name", "last_name", "password"],
+      where: { id: userId },
+    })
+      .then(function (userFound) {
+        if (userFound) {
+          console.log(userFound.email);
+          console.log(req.body.email);
+          userFound
+            .update({
+              email: req.body.email ? req.body.email : userFound.email,
+            })
+            .then(function (userFound) {
+              return res.status(201).json(userFound);
+            })
+            .catch(function (err) {
+              res.status(500).json({ error: "échec de la mise à jour utilisateur" });
+            });
+        } else {
+          res.status(404).json({ error: "utilisateur inconnu" });
+        }
+      })
+      .catch(function () {
+        res.status(500).json({ error: "échec de l'accès à l'utilisateur" });
+      });
+  }
+};
 
 // fonction suppression d'un utilisateur
 exports.deleteUserProfile = (req, res, next) => {};
