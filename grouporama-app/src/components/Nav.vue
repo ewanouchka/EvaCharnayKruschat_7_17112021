@@ -1,11 +1,19 @@
 <template>
   <nav id="nav">
     <div class="nav-links">
-      <router-link to="/">Accueil</router-link> |
-      <router-link to="/profile">Profil</router-link> |
-      <router-link to="/thread">Fil d'actualité</router-link>
+      <router-link to="/">Accueil</router-link>
+      <section v-if="isLoggedIn === true" class="nav-links-loggedin">
+        | <router-link to="/profile">Profil</router-link> |
+        <router-link to="/thread">Fil d'actualité</router-link>
+      </section>
     </div>
-    <button @click.prevent="logOut" class="nav-button">Se déconnecter</button>
+    <button
+      @click.prevent="logOut"
+      v-if="isLoggedIn === true"
+      class="nav-button"
+    >
+      Se déconnecter
+    </button>
     <Popup
       v-if="isPopupVisible === true"
       @close="closePopup"
@@ -28,9 +36,22 @@ export default {
       isPopupVisible: false,
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
+      isLoggedIn: "false",
     };
   },
   methods: {
+    checkAuth() {
+      try {
+        const verify = JSON.parse(localStorage.getItem("userAuth"));
+        if (!verify || verify.token == undefined) {
+          return (this.isLoggedIn = false);
+        } else {
+          return (this.isLoggedIn = true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     showPopup(newMessage, newDetail) {
       this.isPopupVisible = true;
       this.msg = newMessage;
@@ -45,6 +66,9 @@ export default {
       this.showPopup("Vous êtes bien déconnecté !", "");
     },
   },
+  beforeMount() {
+    this.checkAuth();
+  },
 };
 </script>
 
@@ -57,6 +81,7 @@ export default {
   padding: var(--padding-top-bottom);
   color: var(--color-light);
   display: flex;
+  flex-wrap: nowrap;
   justify-content: space-around;
 
   a {
@@ -76,6 +101,10 @@ export default {
 
 .nav-links {
   align-self: center;
+}
+
+.nav-links-loggedin {
+  display: inline;
 }
 
 .nav-button {
