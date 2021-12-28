@@ -1,60 +1,25 @@
 <template>
   <div id="app">
-    <nav id="nav">
-      <div class="nav-links">
-        <router-link to="/">Accueil</router-link> |
-        <router-link to="/profile">Profil</router-link> |
-        <router-link to="/thread">Fil d'actualité</router-link>
-      </div>
-      <button @click.prevent="logOut" class="nav-button">Se déconnecter</button>
-    </nav>
+    <Nav />
     <router-view class="main-section" />
     <footer>
       {{ copyright }}
     </footer>
-    <Popup
-      v-if="isPopupVisible === true"
-      @close="closePopup"
-      :msg="msg"
-      :detail="detail"
-    />
   </div>
 </template>
 
 <script>
-import Popup from "@/components/Popup.vue";
+import Nav from "@/components/Nav.vue";
 
 export default {
   name: "App",
   components: {
-    Popup,
+    Nav,
   },
   computed: {
     copyright() {
       const currentYear = new Date().getFullYear();
       return `Groupomania©${currentYear}`;
-    },
-  },
-  data() {
-    return {
-      isPopupVisible: false,
-      msg: "Aïe... le message est vide",
-      detail: "Aïe... le détail est vide",
-    };
-  },
-  methods: {
-    showPopup(newMessage, newDetail) {
-      this.isPopupVisible = true;
-      this.msg = newMessage;
-      this.detail = newDetail;
-    },
-    closePopup() {
-      this.isPopupVisible = false;
-      window.location.reload();
-    },
-    logOut() {
-      localStorage.removeItem("userAuth");
-      this.showPopup("Vous êtes bien déconnecté !", "");
     },
   },
 };
@@ -71,6 +36,13 @@ body {
   --color-secondary: rgb(247, 128, 128);
   --color-secondary-transparent: rgb(252, 230, 230);
   --color-secondary-dark: rgb(226, 46, 46);
+  --color-secondary-gradient: linear-gradient(
+    -165deg,
+    var(--color-lighter),
+    var(--color-secondary) 25%,
+    var(--color-secondary-dark) 60%,
+    var(--color-secondary-dark)
+  );
   --color-transparent: rgba(255, 255, 255, 0.95);
   --color-lighter: rgb(255, 255, 255);
   --color-light: rgb(199, 199, 199);
@@ -145,13 +117,7 @@ button {
   margin: 1rem;
   border: none;
   border-radius: 2rem;
-  background: linear-gradient(
-    -165deg,
-    var(--color-lighter),
-    var(--color-secondary) 25%,
-    var(--color-secondary-dark) 60%,
-    var(--color-secondary-dark)
-  );
+  background: var(--color-secondary-gradient);
   box-shadow: 0 0 0.5rem var(--color-light);
   height: 2rem;
   padding: 0 1rem;
@@ -164,7 +130,7 @@ button {
     box-shadow: 0 0 0.5rem var(--color-medium);
   }
 }
-
+/*
 #nav {
   width: 100%;
   background: var(--color-primary);
@@ -195,7 +161,7 @@ button {
 
 .nav-button {
   margin: 0 1rem;
-}
+} */
 
 .main-section {
   height: calc(
