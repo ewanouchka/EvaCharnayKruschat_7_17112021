@@ -35,10 +35,10 @@
       <button @click.prevent="loginSubmit" class="button" id="login-submit">
         Connexion
       </button>
-      <router-link to="/signup" class="create-account"
-        >Vous n'avez pas encore de compte ?</router-link
-      >
     </form>
+    <router-link to="/signup" class="create-account"
+      >Vous n'avez pas encore de compte ?</router-link
+    >
     <Popup
       v-if="isPopupVisible === true"
       @close="closePopup"
@@ -59,8 +59,8 @@ export default {
   data() {
     return {
       isPopupVisible: false,
-      msg: "message de base",
-      detail: "detail de base",
+      msg: "Aïe... le message est vide",
+      detail: "Aïe... le détail est vide",
     };
   },
   methods: {
@@ -87,6 +87,7 @@ export default {
         for (const inputValue of inputValues) {
           if (inputValue.validity.valid == false) {
             validity = false;
+            inputValue.classList.add("input-invalid");
           }
         }
         return validity;
@@ -149,6 +150,9 @@ export default {
   align-self: center;
   flex-wrap: wrap;
   max-width: 40rem;
+  background: var(--color-primary-transparent);
+  border-radius: 0.5rem;
+  margin: 0 0 1rem 0;
 }
 
 .create-account {

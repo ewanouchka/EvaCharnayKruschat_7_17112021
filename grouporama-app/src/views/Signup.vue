@@ -101,8 +101,8 @@ export default {
   data() {
     return {
       isPopupVisible: false,
-      msg: "message de base",
-      detail: "detail de base",
+      msg: "Aïe... le message est vide",
+      detail: "Aïe... le détail est vide",
     };
   },
   methods: {
@@ -132,6 +132,7 @@ export default {
         for (const inputValue of inputValues) {
           if (inputValue.validity.valid == false) {
             validity = false;
+            inputValue.classList.add("input-invalid");
           }
         }
         return validity;
@@ -199,39 +200,7 @@ export default {
   align-self: center;
   flex-wrap: wrap;
   max-width: 40rem;
-}
-
-.home__logo {
-  width: 40rem;
-  height: 25rem;
-  object-fit: cover;
-}
-
-@media all and (min-width: 426px) and (max-width: 767px) {
-  .home__logo {
-    width: 400px;
-    height: 15rem;
-  }
-}
-
-@media all and (min-height: 641px) and (max-height: 823px) {
-  .home__logo {
-    width: 400px;
-    height: 15rem;
-  }
-}
-
-@media all and (max-width: 425px) {
-  .home__logo {
-    width: 270px;
-    height: 9rem;
-  }
-}
-
-@media all and (max-height: 640px) {
-  .home__logo {
-    width: 270px;
-    height: 9rem;
-  }
+  background: var(--color-primary-transparent);
+  border-radius: 0.5rem;
 }
 </style>
