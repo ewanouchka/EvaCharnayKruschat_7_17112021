@@ -2,9 +2,9 @@
   <div id="app">
     <nav id="nav">
       <div class="nav-links">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/profile">Profile</router-link> |
-        <router-link to="/about">About</router-link>
+        <router-link to="/">Accueil</router-link> |
+        <router-link to="/profile">Profil</router-link> |
+        <router-link to="/thread">Fil d'actualité</router-link>
       </div>
       <button @click.prevent="logOut" class="nav-button">Se déconnecter</button>
     </nav>
@@ -38,8 +38,8 @@ export default {
   data() {
     return {
       isPopupVisible: false,
-      msg: "le message est vide",
-      detail: "le détail est vide",
+      msg: "Aïe... le message est vide",
+      detail: "Aïe... le détail est vide",
     };
   },
   methods: {
@@ -67,7 +67,9 @@ body {
 
 :root {
   --color-primary: rgb(28, 28, 87);
+  --color-primary-transparent: rgba(28, 40, 155, 0.15);
   --color-secondary: rgb(247, 128, 128);
+  --color-secondary-transparent: rgb(252, 230, 230);
   --color-secondary-dark: rgb(226, 46, 46);
   --color-transparent: rgba(255, 255, 255, 0.95);
   --color-lighter: rgb(255, 255, 255);
@@ -103,6 +105,40 @@ a {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.home__logo {
+  width: 40rem;
+  height: 25rem;
+  object-fit: cover;
+}
+
+@media all and (min-width: 426px) and (max-width: 767px) {
+  .home__logo {
+    width: 400px;
+    height: 15rem;
+  }
+}
+
+@media all and (min-height: 641px) and (max-height: 823px) {
+  .home__logo {
+    width: 400px;
+    height: 15rem;
+  }
+}
+
+@media all and (max-width: 425px) {
+  .home__logo {
+    width: 270px;
+    height: 9rem;
+  }
+}
+
+@media all and (max-height: 640px) {
+  .home__logo {
+    width: 270px;
+    height: 9rem;
+  }
 }
 
 button {
@@ -177,6 +213,7 @@ button {
 }
 .form-input {
   width: 100%;
+  margin: 0 1rem;
   border: 1px solid var(--color-light);
   border-radius: 3px;
   text-align: center;
@@ -185,6 +222,11 @@ button {
     border: 1px solid var(--color-primary);
     outline: transparent auto 0px;
   }
+}
+
+.input-invalid {
+  background: var(--color-secondary-transparent);
+  border: 1px solid var(--color-secondary);
 }
 
 footer {
