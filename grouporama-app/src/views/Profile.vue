@@ -5,7 +5,7 @@
       src="../assets/icon-above-font.svg"
       class="home__logo"
     />
-    <section class="profile__card">
+    <section>
       <div v-if="isEditVisible === true" id="profile-edit">
         <h1>Editer votre profil</h1>
         <form id="profile-form">
@@ -87,17 +87,20 @@
       </div>
 
       <div v-else id="profile-content">
-        <h1>{{ userFirstName }} {{ userLastName }}</h1>
-        <p>{{ userEmail }}</p>
+        <h1>Votre profil</h1>
+        <div class="profile-card">
+          <h1>{{ userFirstName }} {{ userLastName }}</h1>
+          <p>{{ userEmail }}</p>
+        </div>
+
+        <button @click.prevent="showEdit" class="button" id="show-edit">
+          Modifier votre profil
+        </button>
+
+        <button @click.prevent="showEdit" class="button" id="show-edit">
+          Supprimer votre compte
+        </button>
       </div>
-
-      <button @click.prevent="showEdit" class="button" id="show-edit">
-        Modifier votre profil
-      </button>
-
-      <button @click.prevent="showEdit" class="button" id="show-edit">
-        Supprimer votre compte
-      </button>
     </section>
   </div>
 </template>
@@ -155,9 +158,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-#profile-content {
-  border: 2px outset var(--color-secondary);
-  border-radius: 8px;
+.profile-card {
+  border: 2px solid var(--color-secondary);
+  border-radius: 0.5rem;
+  width: 66%;
+  margin: auto;
 }
 
 #profile-form {
