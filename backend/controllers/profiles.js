@@ -93,18 +93,28 @@ exports.updateUserProfile = (req, res, next) => {
     })
       .then(function (userFound) {
         if (userFound) {
-          console.log(userFound.email);
-          console.log(req.body.email);
-          userFound
-            .update({
-              email: req.body.email ? req.body.email : userFound.email,
-            })
-            .then(function (userFound) {
-              return res.status(201).json(userFound);
-            })
-            .catch(function (err) {
-              res.status(500).json({ error: "échec de la mise à jour utilisateur" });
+          const updateUser = (newPass) => {
+            userFound
+              .update({
+                first_name: req.body.first_name ? req.body.first_name : userFound.first_name,
+                last_name: req.body.last_name ? req.body.last_name : userFound.last_name,
+                email: req.body.email ? req.body.email : userFound.email,
+                password: newPass,
+              })
+              .then(function (userFound) {
+                return res.status(201).json(userFound);
+              })
+              .catch(function (err) {
+                res.status(500).json({ error: "échec de la mise à jour utilisateur" });
+              });
+          };
+          if (req.body.password) {
+            bcrypt.hash(req.body.password, 10, function (err, hash) {
+              updateUser(hash);
             });
+          } else {
+            updateUser(userFound.password);
+          }
         } else {
           res.status(404).json({ error: "utilisateur inconnu" });
         }
