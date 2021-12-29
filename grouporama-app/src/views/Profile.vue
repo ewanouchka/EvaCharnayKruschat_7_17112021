@@ -180,20 +180,16 @@ export default {
     },
     closePopup() {
       this.isPopupVisible = false;
-      if (localStorage.getItem("userAuth")) {
-        console.log(localStorage.getItem("userAuth"));
+      if (!localStorage.getItem("userAuth")) {
+        window.location.reload();
+      } else {
+        this.getUserProfile();
       }
     },
     showEdit() {
       this.isEditVisible = true;
     },
     confirmEdit() {
-      this.isEditVisible = false;
-    },
-    showSuppr() {
-      this.isSupprVisible = true;
-    },
-    confirmSuppr() {
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
         const inputValue = document.querySelector(`#${inputId}`).value;
@@ -202,6 +198,9 @@ export default {
 
       const checkAllValidity = () => {
         let validity = true;
+        if (getInputValue("Password") !== getInputValue("Repeat-Password")) {
+          validity = false;
+        }
         for (const inputValue of inputValues) {
           if (inputValue.validity.valid == false) {
             validity = false;
@@ -218,12 +217,86 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const deletionSent = await fetch(
-              "http://localhost:3000/api/auth/deleteUser",
+            const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+
+            const updateSent = await fetch(
+              "http://localhost:3000/api/profile/",
               {
-                method: "POST",
+                method: "PUT",
                 body: JSON.stringify({
-                  userId: JSON.parse(localStorage.getItem("userAuth")).userId,
+                  userId: `${userId}`,
+                  first_name: getInputValue("Surname"),
+                  last_name: getInputValue("Name"),
+                  email: getInputValue("Email"),
+                  password: getInputValue("Password"),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${userToken}`,
+                },
+              }
+            );
+            const updateBackSent = await updateSent.json();
+
+            if (updateBackSent.error) {
+              this.showPopup(
+                "Une erreur est survenue :",
+                `${updateBackSent.error}`
+              );
+            } else {
+              this.showPopup("Les modifications sont enregistrées !", "");
+            }
+          } catch (error) {
+            this.showPopup("Une erreur est survenue :", `${error}`);
+          }
+        })();
+        this.isEditVisible = false;
+      } else {
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe répété doit être identique au premier.`
+        );
+      }
+    },
+    showSuppr() {
+      this.isSupprVisible = true;
+    },
+    confirmSuppr() {
+      const inputValues = document.querySelectorAll(".form-input");
+      const getInputValue = (inputId) => {
+        const inputValue = document.querySelector(`#${inputId}`).value;
+        return inputValue;
+      };
+
+      const checkAllValidity = () => {
+        let validity = true;
+        if (getInputValue("Password") !== getInputValue("Repeat-Password")) {
+          validity = false;
+        }
+        for (const inputValue of inputValues) {
+          if (inputValue.validity.valid == false) {
+            validity = false;
+            inputValue.classList.add("input-invalid");
+          }
+        }
+        return validity;
+      };
+      checkAllValidity();
+
+      if (checkAllValidity()) {
+        (async () => {
+          try {
+            const userToken = JSON.parse(
+              localStorage.getItem("userAuth")
+            ).token;
+            const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+
+            const deletionSent = await fetch(
+              "http://localhost:3000/api/profile/",
+              {
+                method: "DELETE",
+                body: JSON.stringify({
+                  userId: `${userId}`,
                   password: getInputValue("Password"),
                 }),
                 headers: {
@@ -234,10 +307,15 @@ export default {
             );
             const deletionBackSent = await deletionSent.json();
 
-            console.log("deletionSent");
-            console.log(deletionSent);
-            console.log("deletionBackSent");
-            console.log(deletionBackSent);
+            if (deletionBackSent.error) {
+              this.showPopup(
+                "Une erreur est survenue :",
+                `${deletionBackSent.error}`
+              );
+            } else {
+              localStorage.removeItem("userAuth");
+              this.showPopup("Utilisateur supprimé !", "");
+            }
           } catch (error) {
             this.showPopup("Une erreur est survenue :", `${error}`);
           }
@@ -276,7 +354,10 @@ export default {
             return;
           }
         } catch (error) {
-          console.log("impossible d'accéder au profil utilisateur");
+          this.showPopup(
+            "Impossible d'accéder au profil utilisateur.",
+            `${error}.`
+          );
         }
       })();
     },

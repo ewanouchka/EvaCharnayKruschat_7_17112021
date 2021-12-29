@@ -69,4 +69,32 @@ exports.updateUserProfile = (req, res, next) => {
 };
 
 // fonction suppression d'un utilisateur
-exports.deleteUserProfile = (req, res, next) => {};
+exports.deleteUserProfile = (req, res, next) => {
+  models.User.findOne({
+    attributes: ["id", "password"],
+    where: { id: req.body.userId },
+  })
+    .then(function (userFound) {
+      if (userFound) {
+        bcrypt.compare(req.body.password, userFound.password, function (err, resBcrypt) {
+          if (resBcrypt) {
+            userFound
+              .destroy({ where: { id: req.body.userId } })
+              .then(function () {
+                return res.status(201).json({ message: "utilisateur supprimé !" });
+              })
+              .catch(function (err) {
+                res.status(500).json({ error: "échec de la suppression utilisateur" });
+              });
+          } else {
+            return res.status(403).json({ error: "Mot de passe incorrect !" });
+          }
+        });
+      } else {
+        res.status(404).json({ error: "utilisateur inconnu" });
+      }
+    })
+    .catch(function () {
+      res.status(500).json({ error: "échec de l'accès à l'utilisateur" });
+    });
+};
