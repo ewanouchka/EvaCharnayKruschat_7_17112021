@@ -12,49 +12,21 @@ const dbSecretToken = process.env.TOKEN_SECRET;
 
 // fonction accès au profil utilisateur
 exports.getUserProfile = (req, res, next) => {
-  const headerAuth = req.headers["authorization"];
-  let userToken = "";
-
-  if (headerAuth != null) {
-    userToken = headerAuth.replace("Bearer ", "");
-  }
-
-  const getUserId = () => {
-    let userId = -1;
-
-    if (userToken != null) {
-      try {
-        const jwtTokenInfo = jwt.verify(userToken, dbSecretToken);
-        if (jwtTokenInfo != null) {
-          userId = jwtTokenInfo.userId;
-        }
-      } catch (error) {
-        res.status(500).json({ error: "l'id utilisateur n'a pas pu être récupéré" });
+  models.User.findOne({
+    attributes: ["id", "email", "first_name", "last_name"],
+    where: { id: req.body.userId },
+  })
+    .then(function (user) {
+      if (user) {
+        res.status(201).json(user);
+      } else {
+        res.status(404).json({ error: "utilisateur inconnu" });
       }
-    }
-    return userId;
-  };
-
-  const userId = getUserId(userToken);
-
-  if (userId < 0) {
-    return res.status(400).json({ error: "token non reconnu" });
-  } else {
-    models.User.findOne({
-      attributes: ["id", "email", "first_name", "last_name"],
-      where: { id: userId },
     })
-      .then(function (user) {
-        if (user) {
-          res.status(201).json(user);
-        } else {
-          res.status(404).json({ error: "utilisateur inconnu" });
-        }
-      })
-      .catch(function () {
-        res.status(500).json({ error: "échec de l'accès à l'utilisateur" });
-      });
-  }
+    .catch(function () {
+      res.status(500).json({ error: "échec de l'accès à l'utilisateur" });
+    });
+  //}
 };
 
 // fonction modification du profil utilisateur

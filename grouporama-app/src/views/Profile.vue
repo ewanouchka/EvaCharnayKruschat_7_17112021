@@ -7,7 +7,7 @@
     />
     <section>
       <div v-if="isEditVisible === true" id="profile-edit">
-        <h1>Editer votre profil</h1>
+        <h1>Modifier votre profil</h1>
         <form id="profile-form">
           <label for="Nom" class="form-label">Votre nom :</label>
           <input
@@ -16,7 +16,6 @@
             id="Name"
             class="form-input"
             type="text"
-            required
             pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
           />
           <span class="error-visible" id="error-message-Name"></span>
@@ -31,7 +30,6 @@
             id="Surname"
             class="form-input"
             type="text"
-            required
             pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
           />
 
@@ -45,12 +43,49 @@
             id="Email"
             class="form-input"
             type="email"
-            required
             pattern="^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$"
           />
 
           <label for="Password" class="form-label"
             >Votre mot de passe :
+            <span class="error-visible" id="error-message-Password"></span>
+          </label>
+          <input
+            placeholder="123456AzErTy*"
+            name="Password"
+            id="Password"
+            class="form-input"
+            type="password"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
+          />
+
+          <label for="RepeatPassword" class="form-label"
+            >Répétez votre mot de passe :
+            <span
+              class="error-visible"
+              id="error-message-Repeat-Password"
+            ></span>
+          </label>
+          <input
+            placeholder="123456AzErTy*"
+            name="Repeat-Password"
+            id="Repeat-Password"
+            class="form-input"
+            type="password"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
+          />
+
+          <button @click.prevent="confirmEdit" class="button" id="edit-profile">
+            Enregistrer les modifications
+          </button>
+        </form>
+      </div>
+
+      <div v-else-if="isSupprVisible === true" id="profile-suppr">
+        <h1>Supprimer votre compte</h1>
+        <form id="profile-form">
+          <label for="Password" class="form-label"
+            >Saisissez votre mot de passe :
             <span class="error-visible" id="error-message-Password"></span>
           </label>
           <input
@@ -80,8 +115,12 @@
             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
-          <button @click.prevent="closeEdit" class="button" id="edit-profile">
-            Enregistrer les modifications
+          <button
+            @click.prevent="confirmSuppr"
+            class="button"
+            id="suppr-profile"
+          >
+            Supprimer votre compte
           </button>
         </form>
       </div>
@@ -97,17 +136,28 @@
           Modifier votre profil
         </button>
 
-        <button @click.prevent="showEdit" class="button" id="show-edit">
+        <button @click.prevent="showSuppr" class="button" id="show-suppr">
           Supprimer votre compte
         </button>
       </div>
     </section>
+    <Popup
+      v-if="isPopupVisible === true"
+      @close="closePopup"
+      :msg="msg"
+      :detail="detail"
+    />
   </div>
 </template>
 
 <script>
+import Popup from "@/components/Popup.vue";
+
 export default {
   name: "Profile",
+  components: {
+    Popup,
+  },
   props: ["userSurname", "userName", "email"],
   data: function () {
     return {
@@ -116,26 +166,107 @@ export default {
       userLastName: this.userName,
       userEmail: this.email,
       isEditVisible: false,
+      isSupprVisible: false,
+      isPopupVisible: false,
+      msg: "Aïe... le message est vide",
+      detail: "Aïe... le détail est vide",
     };
   },
   methods: {
+    showPopup(newMessage, newDetail) {
+      this.isPopupVisible = true;
+      this.msg = newMessage;
+      this.detail = newDetail;
+    },
+    closePopup() {
+      this.isPopupVisible = false;
+      if (localStorage.getItem("userAuth")) {
+        console.log(localStorage.getItem("userAuth"));
+      }
+    },
     showEdit() {
       this.isEditVisible = true;
     },
-    closeEdit() {
+    confirmEdit() {
       this.isEditVisible = false;
+    },
+    showSuppr() {
+      this.isSupprVisible = true;
+    },
+    confirmSuppr() {
+      const inputValues = document.querySelectorAll(".form-input");
+      const getInputValue = (inputId) => {
+        const inputValue = document.querySelector(`#${inputId}`).value;
+        return inputValue;
+      };
+
+      const checkAllValidity = () => {
+        let validity = true;
+        for (const inputValue of inputValues) {
+          if (inputValue.validity.valid == false) {
+            validity = false;
+            inputValue.classList.add("input-invalid");
+          }
+        }
+        return validity;
+      };
+      checkAllValidity();
+
+      if (checkAllValidity()) {
+        (async () => {
+          try {
+            const userToken = JSON.parse(
+              localStorage.getItem("userAuth")
+            ).token;
+            const deletionSent = await fetch(
+              "http://localhost:3000/api/auth/deleteUser",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  userId: JSON.parse(localStorage.getItem("userAuth")).userId,
+                  password: getInputValue("Password"),
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${userToken}`,
+                },
+              }
+            );
+            const deletionBackSent = await deletionSent.json();
+
+            console.log("deletionSent");
+            console.log(deletionSent);
+            console.log("deletionBackSent");
+            console.log(deletionBackSent);
+          } catch (error) {
+            this.showPopup("Une erreur est survenue :", `${error}`);
+          }
+        })();
+        this.isSupprVisible = false;
+      } else {
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe répété doit être identique au premier.`
+        );
+      }
     },
     getUserProfile() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
+      const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+
       (async () => {
         try {
           const userProfile = await fetch("http://localhost:3000/api/profile", {
             method: "POST",
+            body: JSON.stringify({
+              userId: `${userId}`,
+            }),
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${userToken}`,
             },
           });
+
           const userProfileJSON = await userProfile.json();
 
           if (userProfileJSON) {

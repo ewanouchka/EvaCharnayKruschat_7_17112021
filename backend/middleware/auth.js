@@ -12,14 +12,17 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(token, dbSecretToken);
     const userId = decodedToken.userId;
-    // si l'utilisateur n'est pas connecté ou, pour les requêtes PUT et DELETE, s'il n'est pas le propriétaire du compte, du message ou du commentaire
-    // revoir la condition if
-    if (!userId || (req.body.userId && req.body.userId !== userId)) {
-      res.status(403).json({ message: "Unauthorized request - authentification requise." });
+    const reqUserId = req.body.userId ? JSON.parse(req.body.userId) : null;
+
+    // si l'utilisateur n'est pas connecté ou s'il n'est pas le propriétaire du compte, du message ou du commentaire
+    // revoir la condition pour inclure les droits admin
+
+    if (!userId || !reqUserId || reqUserId !== userId) {
+      res.status(403).json({ message: "utilisateur non autorisé" });
     } else {
       next();
     }
   } catch (error) {
-    res.status(401).json({ error });
+    res.status(401).json({ error: "l'authentification a échoué" });
   }
 };
