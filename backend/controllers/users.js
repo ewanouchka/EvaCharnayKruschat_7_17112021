@@ -72,7 +72,3 @@ exports.login = (req, res, next) => {
     })
     .catch((err) => res.status(500).json({ error: "La vérification de la liste utilisateurs a échoué." }));
 };
-
-exports.deleteUser = (req, res, next) => {
-  // à voir
-};

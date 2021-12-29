@@ -11,6 +11,5 @@ const userCtrl = require("../controllers/users");
 // on crée les routes
 router.post("/signup", userCtrl.signup);
 router.post("/login", userCtrl.login);
-router.delete("/", auth, userCtrl.deleteUser); // à revoir
 
 module.exports = router;
