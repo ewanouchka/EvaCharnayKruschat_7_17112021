@@ -1,15 +1,17 @@
 <template>
   <div class="profile">
-    <img
-      alt="logo above Groupomania"
-      src="../assets/icon-above-font.svg"
-      class="home__logo"
-    />
+    <router-link to="/"
+      ><img
+        alt="logo above Groupomania"
+        src="../assets/icon-above-font.svg"
+        class="home__logo"
+    /></router-link>
     <section>
+      <!-- revoir les for="Nom" / input name="Name" -->
       <div v-if="isEditVisible === true" id="profile-edit">
         <h1>Modifier votre profil</h1>
         <form id="profile-form">
-          <label for="Nom" class="form-label">Votre nom :</label>
+          <label for="Name" class="form-label">Votre nom :</label>
           <input
             placeholder="Dupont"
             name="Name"
@@ -20,7 +22,7 @@
           />
           <span class="error-visible" id="error-message-Name"></span>
 
-          <label for="Prénom" class="form-label"
+          <label for="Surname" class="form-label"
             >Votre prénom :
             <span class="error-visible" id="error-message-Surname"></span>
           </label>
@@ -59,7 +61,7 @@
             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
-          <label for="RepeatPassword" class="form-label"
+          <label for="Repeat-Password" class="form-label"
             >Répétez votre mot de passe :
             <span
               class="error-visible"
@@ -98,7 +100,7 @@
             pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
-          <label for="RepeatPassword" class="form-label"
+          <label for="Repeat-Password" class="form-label"
             >Répétez votre mot de passe :
             <span
               class="error-visible"
@@ -181,7 +183,7 @@ export default {
     closePopup() {
       this.isPopupVisible = false;
       if (!localStorage.getItem("userAuth")) {
-        window.location.reload();
+        window.location.replace("/");
       } else {
         this.getUserProfile();
       }
@@ -190,6 +192,7 @@ export default {
       this.isEditVisible = true;
     },
     confirmEdit() {
+      // mettre checkAllValidity en méthode et la rappeler seulement dans le if
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
         const inputValue = document.querySelector(`#${inputId}`).value;
@@ -217,10 +220,10 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+            const userId = new URL(location.href).searchParams.get("id");
 
             const updateSent = await fetch(
-              "http://localhost:3000/api/profile/",
+              `http://localhost:3000/api/profile/${userId}`,
               {
                 method: "PUT",
                 body: JSON.stringify({
@@ -262,6 +265,7 @@ export default {
       this.isSupprVisible = true;
     },
     confirmSuppr() {
+      // mettre checkAllValidity en méthode et la rappeler seulement dans le if
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
         const inputValue = document.querySelector(`#${inputId}`).value;
@@ -289,10 +293,10 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+            const userId = new URL(location.href).searchParams.get("id");
 
             const deletionSent = await fetch(
-              "http://localhost:3000/api/profile/",
+              `http://localhost:3000/api/profile/${userId}`,
               {
                 method: "DELETE",
                 body: JSON.stringify({
@@ -330,20 +334,20 @@ export default {
     },
     getUserProfile() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
-      const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+      const userId = new URL(location.href).searchParams.get("id");
 
       (async () => {
         try {
-          const userProfile = await fetch("http://localhost:3000/api/profile", {
-            method: "POST",
-            body: JSON.stringify({
-              userId: `${userId}`,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
+          const userProfile = await fetch(
+            `http://localhost:3000/api/profile/${userId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
 
           const userProfileJSON = await userProfile.json();
 

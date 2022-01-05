@@ -1,14 +1,15 @@
 <template>
   <div class="signup">
-    <img
-      alt="logo above Groupomania"
-      src="../assets/icon-above-font.svg"
-      class="home__logo"
-    />
+    <router-link to="/"
+      ><img
+        alt="logo above Groupomania"
+        src="../assets/icon-above-font.svg"
+        class="home__logo"
+    /></router-link>
     <h1>Enregistrez votre compte utilisateur</h1>
     <p>Veuillez remplir tous les champs</p>
     <form id="signup-form">
-      <label for="Nom" class="form-label">Votre nom :</label>
+      <label for="Name" class="form-label">Votre nom :</label>
       <input
         placeholder="Dupont"
         name="Name"
@@ -20,10 +21,7 @@
       />
       <span class="error-visible" id="error-message-Name"></span>
 
-      <label for="Prénom" class="form-label"
-        >Votre prénom :
-        <span class="error-visible" id="error-message-Surname"></span>
-      </label>
+      <label for="Surname" class="form-label">Votre prénom : </label>
       <input
         placeholder="Dominique"
         name="Surname"
@@ -34,10 +32,7 @@
         pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
       />
 
-      <label for="Email" class="form-label"
-        >Votre e-mail :
-        <span class="error-visible" id="error-message-Email"></span>
-      </label>
+      <label for="Email" class="form-label">Votre e-mail : </label>
       <input
         placeholder="contact@groupomania.com"
         name="Email"
@@ -49,10 +44,7 @@
       />
 
       <!-- oninput="checkValidity(this)" -->
-      <label for="Password" class="form-label"
-        >Votre mot de passe :
-        <span class="error-visible" id="error-message-Password"></span>
-      </label>
+      <label for="Password" class="form-label">Votre mot de passe : </label>
       <input
         placeholder="123456AzErTy*"
         name="Password"
@@ -63,9 +55,8 @@
         pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
       />
 
-      <label for="RepeatPassword" class="form-label"
+      <label for="Repeat-Password" class="form-label"
         >Répétez votre mot de passe :
-        <span class="error-visible" id="error-message-Repeat-Password"></span>
       </label>
       <input
         placeholder="123456AzErTy*"

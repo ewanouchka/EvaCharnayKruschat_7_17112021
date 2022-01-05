@@ -36,7 +36,7 @@ app.use(bodyParser.json());
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 // pour l'utilisation des routes
-app.use("/api/auth", userRoutes);
-app.use("/api/profile", profileRoutes);
+app.use("/api/auth", userRoutes); // revoir convention de nommage
+app.use("/api/profile", profileRoutes); // revoir convention de nommage
 
 module.exports = app;

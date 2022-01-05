@@ -3,7 +3,11 @@
     <div class="nav-links">
       <router-link to="/">Accueil</router-link>
       <section v-if="isLoggedIn === true" class="nav-links-loggedin">
-        | <router-link to="/profile">Profil</router-link> |
+        |
+        <router-link :to="{ name: 'Profile', params: { userId: `${userId}` } }"
+          >Profil</router-link
+        >
+        |
         <router-link to="/thread">Fil d'actualité</router-link>
       </section>
     </div>
@@ -37,16 +41,19 @@ export default {
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
       isLoggedIn: "false",
+      userId: null,
     };
   },
   methods: {
     checkAuth() {
       try {
         const verify = JSON.parse(localStorage.getItem("userAuth"));
+        const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+        console.log(userId);
         if (!verify || verify.token == undefined) {
           return (this.isLoggedIn = false);
         } else {
-          return (this.isLoggedIn = true);
+          return (this.isLoggedIn = true), (this.userId = userId);
         }
       } catch (error) {
         console.log(error);
@@ -59,7 +66,7 @@ export default {
     },
     closePopup() {
       this.isPopupVisible = false;
-      window.location.reload();
+      window.location.replace("/");
     },
     logOut() {
       localStorage.removeItem("userAuth");
@@ -109,5 +116,17 @@ export default {
 
 .nav-button {
   margin: 0 1rem;
+}
+
+@media all and (max-width: 425px) {
+  #nav {
+    flex-direction: column;
+  }
+
+  .nav-button {
+    margin: 0.25rem auto;
+    width: 55%;
+    padding: 0.25rem 0;
+  }
 }
 </style>

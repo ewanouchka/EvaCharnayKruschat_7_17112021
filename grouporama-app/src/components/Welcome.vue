@@ -22,18 +22,19 @@ export default {
     getUserName() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
       const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+
       (async () => {
         try {
-          const userProfile = await fetch("http://localhost:3000/api/profile", {
-            method: "POST",
-            body: JSON.stringify({
-              userId: `${userId}`,
-            }),
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userToken}`,
-            },
-          });
+          const userProfile = await fetch(
+            `http://localhost:3000/api/profile/${userId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
 
           const userProfileJSON = await userProfile.json();
 

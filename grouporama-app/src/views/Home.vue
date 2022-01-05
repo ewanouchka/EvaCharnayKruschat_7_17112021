@@ -1,10 +1,11 @@
 <template>
   <div class="home">
-    <img
-      alt="logo above Groupomania"
-      src="../assets/icon-above-font.svg"
-      class="home__logo"
-    />
+    <router-link to="/"
+      ><img
+        alt="logo above Groupomania"
+        src="../assets/icon-above-font.svg"
+        class="home__logo"
+    /></router-link>
     <section v-if="isLoggedIn === false"><Login /></section>
     <section v-else><Welcome /></section>
   </div>

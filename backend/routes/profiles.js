@@ -9,8 +9,8 @@ const auth = require("../middleware/auth");
 const profileCtrl = require("../controllers/profiles");
 
 // on crée les routes
-router.post("/", auth, profileCtrl.getUserProfile); // à revoir
-router.put("/", auth, profileCtrl.updateUserProfile); // à revoir
-router.delete("/", auth, profileCtrl.deleteUserProfile); // à revoir
+router.get("/:id", auth, profileCtrl.getUserProfile);
+router.put("/:id", auth, profileCtrl.updateUserProfile);
+router.delete("/:id", auth, profileCtrl.deleteUserProfile);
 
 module.exports = router;

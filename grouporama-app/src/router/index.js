@@ -16,7 +16,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "signup" */ "../views/Signup.vue"),
   },
   {
-    path: "/profile",
+    path: "/profile/?id=:userId",
     name: "Profile",
     component: () => import(/* webpackChunkName: "profile" */ "../views/Profile.vue"),
     beforeEnter: (to, from, next) => {
