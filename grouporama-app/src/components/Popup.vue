@@ -35,9 +35,9 @@ export default {
 .popup-bloc {
   height: auto;
   width: 280px;
-  background: var(--color-lighter);
-  border-radius: 3rem;
-  box-shadow: 0 0 0.5rem var(--color-primary);
+  background: var(--color-secondary-transparent);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-secondary);
   font-family: var(--font-text);
   color: var(--color-dark);
   text-align: center;

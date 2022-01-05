@@ -130,38 +130,6 @@ button {
     box-shadow: 0 0 0.5rem var(--color-medium);
   }
 }
-/*
-#nav {
-  width: 100%;
-  background: var(--color-primary);
-  height: var(--header-size);
-  padding: var(--padding-top-bottom);
-  color: var(--color-light);
-  display: flex;
-  justify-content: space-around;
-
-  a {
-    font-weight: bold;
-    color: var(--color-lighter);
-    transition: all 0.3s ease-in-out;
-
-    &:hover {
-      color: var(--color-secondary);
-    }
-
-    &.router-link-exact-active {
-      color: var(--color-secondary);
-    }
-  }
-}
-
-.nav-links {
-  align-self: center;
-}
-
-.nav-button {
-  margin: 0 1rem;
-} */
 
 .main-section {
   height: calc(
