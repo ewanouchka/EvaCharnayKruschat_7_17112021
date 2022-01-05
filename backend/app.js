@@ -6,6 +6,7 @@ const path = require("path");
 // import des routes
 const userRoutes = require("./routes/users.js");
 const profileRoutes = require("./routes/profiles.js");
+const messageRoutes = require("./routes/messages.js");
 
 // import des variables environnementales
 const dotEnv = require("dotenv");
@@ -38,5 +39,6 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 // pour l'utilisation des routes
 app.use("/api/auth", userRoutes); // revoir convention de nommage
 app.use("/api/profile", profileRoutes); // revoir convention de nommage
+app.use("/api/messages", messageRoutes); // revoir convention de nommage
 
 module.exports = app;
