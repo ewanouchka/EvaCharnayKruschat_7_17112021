@@ -1,6 +1,17 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
+import Signup from "../views/Signup.vue";
+import Profile from "../views/Profile.vue";
+import Thread from "../views/Thread.vue";
+import Error404 from "../views/Error404.vue";
+
+const checkAuth = () => {
+  const userAuth = JSON.parse(localStorage.getItem("userAuth"));
+  console.log(userAuth);
+  if (userAuth && userAuth.token) return true;
+  else return false;
+};
 
 Vue.use(VueRouter);
 
@@ -13,25 +24,31 @@ const routes = [
   {
     path: "/signup",
     name: "Signup",
-    component: () => import(/* webpackChunkName: "signup" */ "../views/Signup.vue"),
+    component: Signup,
   },
   {
     path: "/profile/?id=:userId",
     name: "Profile",
-    component: () => import(/* webpackChunkName: "profile" */ "../views/Profile.vue"),
+    component: Profile,
     beforeEnter: (to, from, next) => {
-      if (JSON.parse(localStorage.getItem("userAuth")) && JSON.parse(localStorage.getItem("userAuth")).token) next();
+      if (checkAuth()) next();
       else next({ name: "Home" });
     },
   },
   {
     path: "/thread",
     name: "Thread",
-    component: () => import(/* webpackChunkName: "about" */ "../views/Thread.vue"),
+    component: Thread,
     beforeEnter: (to, from, next) => {
-      if (JSON.parse(localStorage.getItem("userAuth")) && JSON.parse(localStorage.getItem("userAuth")).token) next();
+      console.log("On teste");
+      if (checkAuth()) next();
       else next({ name: "Home" });
     },
+  },
+  {
+    path: "*",
+    name: "Error404",
+    component: Error404,
   },
 ];
 
