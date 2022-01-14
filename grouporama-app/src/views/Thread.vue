@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="thread">
     <router-link to="/"
       ><img
         alt="logo left Groupomania"
