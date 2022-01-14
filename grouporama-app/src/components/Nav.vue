@@ -50,7 +50,7 @@ export default {
         const verify = JSON.parse(localStorage.getItem("userAuth"));
         const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
 
-        if (!verify || verify.token == undefined) {
+        if (!verify || verify.token == undefined || verify.token == "") {
           return (this.isLoggedIn = false);
         } else {
           return (this.isLoggedIn = true), (this.userId = userId);

@@ -8,8 +8,7 @@ import Error404 from "../views/Error404.vue";
 
 const checkAuth = () => {
   const userAuth = JSON.parse(localStorage.getItem("userAuth"));
-  console.log(userAuth);
-  if (userAuth && userAuth.token) return true;
+  if (userAuth && userAuth.token && userAuth.token !== "") return true;
   else return false;
 };
 

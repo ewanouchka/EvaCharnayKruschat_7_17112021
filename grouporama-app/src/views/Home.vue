@@ -31,7 +31,7 @@ export default {
     checkAuth() {
       try {
         const verify = JSON.parse(localStorage.getItem("userAuth"));
-        if (!verify || verify.token == undefined) {
+        if (!verify || verify.token == undefined || verify.token == "") {
           return (this.isLoggedIn = false);
         } else {
           return (this.isLoggedIn = true);
