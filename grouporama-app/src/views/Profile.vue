@@ -153,6 +153,11 @@
 </template>
 
 <script>
+// mettre checkAllValidity en méthode et la rappeler seulement dans le if
+// ne plus utiliser de querySelector, mais les data
+// revoir le popup si aucune modification n'est apportée (peut-être dans checkValidity ?)
+// revoir css responsive sur les boutons + largeur bloc encadré
+// revoir pour les formulaires en général : affichage message d'erreur sur chaque ligne
 import Popup from "@/components/Popup.vue";
 
 export default {
@@ -172,6 +177,7 @@ export default {
       isPopupVisible: false,
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
+      isLoggedIn: true,
     };
   },
   methods: {
@@ -184,6 +190,10 @@ export default {
       this.isPopupVisible = false;
       if (!localStorage.getItem("userAuth")) {
         window.location.replace("/");
+      }
+      if (this.isLoggedIn == false) {
+        localStorage.removeItem("userAuth");
+        window.location.replace("/");
       } else {
         this.getUserProfile();
       }
@@ -192,7 +202,6 @@ export default {
       this.isEditVisible = true;
     },
     confirmEdit() {
-      // mettre checkAllValidity en méthode et la rappeler seulement dans le if
       const inputValues = document.querySelectorAll(".form-input");
       const getInputValue = (inputId) => {
         const inputValue = document.querySelector(`#${inputId}`).value;
@@ -350,12 +359,17 @@ export default {
           );
 
           const userProfileJSON = await userProfile.json();
-
           if (userProfileJSON) {
             this.userFirstName = userProfileJSON.first_name;
             this.userLastName = userProfileJSON.last_name;
             this.userEmail = userProfileJSON.email;
-            return;
+          }
+          if (userProfileJSON.error) {
+            this.isLoggedIn = false;
+            this.showPopup(
+              `Erreur : ${userProfileJSON.error}`,
+              "Votre session a peut-être expiré ? Essayez de vous reconnecter."
+            );
           }
         } catch (error) {
           this.showPopup(
@@ -386,7 +400,6 @@ export default {
   justify-content: center;
   align-self: center;
   flex-wrap: wrap;
-  max-width: 40rem;
   background: var(--color-primary-transparent);
   border-radius: 0.5rem;
 }
