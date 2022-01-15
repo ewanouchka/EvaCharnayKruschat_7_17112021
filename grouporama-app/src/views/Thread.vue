@@ -6,9 +6,10 @@
         src="../assets/icon-left-font.svg"
         class="thread__logo"
     /></router-link>
+    <a href="#Text-Editor"><button>Poster un message</button></a>
     <h1>Fil d'actualité</h1>
     <section><Messages /></section>
-    <section><TextEditor /></section>
+    <section id="Text-Editor"><TextEditor /></section>
   </div>
 </template>
 
@@ -32,11 +33,28 @@ export default {
 
 
 
-<style lang="scss">
+<style scoped lang="scss">
+// revoir le css responsive
+.thread {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: space-between;
+}
+
 .thread__logo {
   width: 40rem;
   height: 10rem;
   object-fit: cover;
+}
+
+.thread h1 {
+  margin: 0;
+  align-self: center;
+  flex: 1;
+}
+
+.thread section {
+  width: 100%;
 }
 
 @media all and (min-width: 426px) and (max-width: 767px) {
@@ -56,12 +74,19 @@ export default {
 @media all and (max-width: 425px) {
   .thread__logo {
     width: 270px;
-    height: 9rem;
-    padding-right: 10px;
+    height: 6rem;
+    padding: 0 20px 0 0;
   }
-}
-
-h1 {
-  margin: 0;
+  .thread {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .thread h1 {
+    width: 100%;
+  }
+  .thread button {
+    margin: 0 1rem 1rem 1rem;
+  }
 }
 </style>
