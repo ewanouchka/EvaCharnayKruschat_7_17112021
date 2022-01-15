@@ -149,7 +149,6 @@ export default {
   justify-content: center;
   align-self: center;
   flex-wrap: wrap;
-  max-width: 40rem;
   background: var(--color-primary-transparent);
   border-radius: 0.5rem;
   margin: 0 0 1rem 0;
