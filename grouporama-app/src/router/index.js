@@ -39,7 +39,6 @@ const routes = [
     name: "Thread",
     component: Thread,
     beforeEnter: (to, from, next) => {
-      console.log("On teste");
       if (checkAuth()) next();
       else next({ name: "Home" });
     },
