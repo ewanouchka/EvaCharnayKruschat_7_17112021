@@ -8,7 +8,7 @@
     /></router-link>
     <h1>Erreur 404</h1>
     <section>
-      <p>Cette page n'existe pas :(</p>
+      <p>Cette page n'est pas accessible :(</p>
       <router-link to="/" class="back-home">Retour à l'accueil</router-link>
     </section>
   </div>
