@@ -7,16 +7,14 @@ const models = require("../db/models");
 
 // fonction accès aux posts
 exports.getMessages = (req, res, next) => {
-  const fields = req.query.fields;
   const limit = parseInt(req.query.limit);
   const offset = parseInt(req.query.offset);
   const order = req.query.order;
 
   models.Message.findAll({
     order: [order != null ? order.split(":") : ["createdAt", "DESC"]],
-    attributes: fields !== "*" && fields != null ? fields.split(",") : null,
-    limit: !isNaN(limit) ? limit : null,
-    offset: !isNaN(offset) ? offset : null,
+    limit: !isNaN(limit) ? limit : 10,
+    offset: !isNaN(offset) ? offset : 0,
     include: [
       {
         model: models.User,
