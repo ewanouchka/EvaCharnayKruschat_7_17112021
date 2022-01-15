@@ -67,6 +67,10 @@ a {
   }
 }
 
+.router-link-active {
+  margin: auto;
+}
+
 #app {
   font-family: var(--font-text);
   font-size: var(--font-size);
@@ -136,6 +140,7 @@ button {
     100vh - var(--header-size) - var(--footer-size) - 4 *
       var(--padding-top-bottom)
   );
+  width: 50rem;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -144,6 +149,7 @@ button {
   width: 100%;
   margin: 1rem 0 0 0;
   font-weight: bold;
+  font-family: var(--font-text);
 }
 .form-input {
   width: 100%;
@@ -151,6 +157,7 @@ button {
   border: 1px solid var(--color-light);
   border-radius: 3px;
   text-align: center;
+  font-family: var(--font-text);
 
   &:focus-visible {
     border: 1px solid var(--color-primary);
