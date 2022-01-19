@@ -11,6 +11,13 @@
           <span v-html="item.createdAt"></span>
         </h3>
         <p>{{ item.content }}</p>
+        <div class="post-options">
+          <i class="fas fa-reply post-options__icons"></i>
+          <span v-if="showActions(item.UserId, userId, isAdmin) === true">
+            <i class="fas fa-pencil-alt post-options__icons"></i>
+            <i class="fas fa-trash-alt post-options__icons"></i>
+          </span>
+        </div>
         <div class="post-likes">
           <i class="fas fa-heart"></i> {{ item.likes }}
         </div>
@@ -28,7 +35,6 @@
 
 <script>
 // ajouter bouton page suivante pour offset suivant/précédent
-// supprimer le choix du nombre de messages par pages -> limite 10 fixe
 // ajouter fonction like + anim coeur
 // ajouter boutons modifier/supprimer + fonctions backend
 // voir les droits admins pour ces fonctions modif/suppr
@@ -62,6 +68,8 @@ export default {
       }
     },
     getPosts() {
+      const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+      this.userId = userId;
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
       (async () => {
         try {
@@ -75,24 +83,32 @@ export default {
 
           const postsJSON = await posts.json();
 
-          if (postsJSON) {
-            // pour voir les infos --> voir pour map sur l'array de messages
-            for (const message of postsJSON) {
-              const day = message.createdAt.substr(8, 2);
-              const month = message.createdAt.substr(5, 2);
-              const year = message.createdAt.substr(0, 4);
-              message.createdAt = day + "/" + month + "/" + year;
-            }
-
-            this.messages = postsJSON;
-          }
-
           if (postsJSON.error) {
             this.isLoggedIn = false;
             this.showPopup(
               `Erreur : ${postsJSON.error}`,
               "Votre session a peut-être expiré ? Essayez de vous reconnecter."
             );
+          }
+
+          if (postsJSON) {
+            // voir une méthode js pour le faire en direct
+
+            for (const message of postsJSON) {
+              const postDate = new Date(message.createdAt);
+              const dateOptions = {
+                weekday: "short",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              };
+              message.createdAt = postDate.toLocaleDateString(
+                "fr-FR",
+                dateOptions
+              );
+            }
+
+            this.messages = postsJSON;
           }
         } catch (error) {
           this.showPopup(
@@ -101,6 +117,27 @@ export default {
           );
         }
       })();
+    },
+    showActions(postUser, userId, isAdmin) {
+      isAdmin = false;
+      console.log("postUser");
+      console.log(postUser);
+      console.log("userId");
+      console.log(userId);
+      console.log("isAdmin");
+      console.log(isAdmin);
+      // route pour fetch dans le token utilisateur l'info admin ?
+      if (isAdmin === true) {
+        return true;
+      }
+
+      if (postUser === userId) {
+        return true;
+      } /*
+
+      if (postUser !== userId) {
+        return false;
+      }*/
     },
   },
   beforeMount() {
@@ -119,22 +156,24 @@ export default {
   margin: 0 0 1rem 0;
   padding: 0.25rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 h2 {
   margin: 0;
   border-bottom: 1px solid var(--color-primary);
   font-size: 1.25rem;
-  width: 80%;
+  width: 100%;
 }
 h3 {
+  width: 100%;
   margin: 0;
   font-size: 1rem;
   font-weight: normal;
   font-style: italic;
 }
 p {
+  width: 100%;
   margin: 0.5rem;
   padding: 0.25rem;
   align-self: stretch;
@@ -142,8 +181,13 @@ p {
   border-radius: 0.5rem;
   text-align: justify;
 }
+.post-options {
+  margin: 0 0 0.25rem 1rem;
+}
+.post-options__icons {
+  margin: 0 0.75rem 0 0;
+}
 .post-likes {
-  align-self: flex-end;
-  margin: 0 1rem 0 0;
+  margin: 0 1rem 0.25rem 0;
 }
 </style>
