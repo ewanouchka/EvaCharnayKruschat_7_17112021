@@ -12,6 +12,10 @@ const dbSecretToken = process.env.TOKEN_SECRET;
 
 // fonction enregistrer un nouvel utilisateur
 exports.signup = (req, res, next) => {
+  // on bloque si des champs sont manquants
+  if (!req.body.first_name || !req.body.last_name || !req.body.email || !req.body.password) {
+    res.status(400).json({ error: "Certains champs ne sont pas remplis." });
+  }
   // on vérifie que l'email de la requête est bien différent de ceux déjà présents dans la base de données
   models.User.findOne({
     attributes: ["email"],
@@ -49,6 +53,10 @@ exports.signup = (req, res, next) => {
 
 // fonction connexion d'un utilisateur
 exports.login = (req, res, next) => {
+  // on bloque si des champs sont manquants
+  if (!req.body.email || !req.body.password) {
+    res.status(400).json({ error: "Certains champs ne sont pas remplis." });
+  }
   models.User.findOne({
     where: { email: req.body.email },
   })
