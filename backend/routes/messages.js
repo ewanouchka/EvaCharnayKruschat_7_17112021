@@ -11,7 +11,7 @@ const messageCtrl = require("../controllers/messages");
 // on crée les routes -- A REVOIR
 router.get("/", auth, messageCtrl.getMessages);
 router.post("/", auth, messageCtrl.sendMessage);
-router.put("/:id", auth, messageCtrl.updateMessage);
-router.delete("/:id", auth, messageCtrl.deleteMessage);
+router.put("/:messageId", auth, messageCtrl.updateMessage);
+router.delete("/:messageId", auth, messageCtrl.deleteMessage);
 
 module.exports = router;
