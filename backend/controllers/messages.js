@@ -1,6 +1,27 @@
 // import des models
 const models = require("../db/models");
 
+// fonctions de vérification des champs des requêtes
+const checkTextValidity = (text) => {
+  // on bloque si des champs requis sont manquants
+  if (!text) {
+    throw "Certains champs ne sont pas remplis.";
+  }
+
+  // on supprime les espaces au début et à la fin de la chaîne
+  text = text.trim();
+
+  // on bloque aussi si les champs renseignés sont trop courts
+  if (text.length <= 3) {
+    throw "Le contenu est trop court.";
+  }
+};
+
+const checkFields = (title, content) => {
+  checkTextValidity(title);
+  checkTextValidity(content);
+};
+
 // fonction accès aux posts
 exports.getMessages = (req, res, next) => {
   const limit = parseInt(req.query.limit);
@@ -18,129 +39,107 @@ exports.getMessages = (req, res, next) => {
       },
     ],
   })
-    .then(function (messages) {
+    .then((messages) => {
       if (messages) {
-        res.status(200).json(messages);
+        return res.status(200).json(messages);
       } else {
-        res.status(404).json({ error: "aucun message trouvé." });
+        return res.status(404).json({ error: "Aucun message trouvé." });
       }
     })
-    .catch(function (err) {
-      res.status(500).json({ error: "la demande est incorrecte." });
+    .catch(() => {
+      return res.status(500).json({ error: "La demande est incorrecte." });
     });
 };
 
 // fonction envoi d'un nouveau post
 exports.sendMessage = (req, res, next) => {
-  // on bloque si des champs requis sont manquants
-  if (!req.body.title || !req.body.content) {
-    res.status(400).json({ error: "Certains champs ne sont pas remplis." });
-  }
+  // constantes
+  const userId = res.locals.userId;
 
-  // on bloque aussi si les champs renseignés sont trop courts
-  if (req.body.title <= 3 || req.body.content <= 3) {
-    return res.status(400).json({ error: "Le contenu est trop court." });
-  }
-
-  // si c'est ok, on crée le message
   models.User.findOne({
-    where: { id: req.body.userId },
+    where: { id: userId },
   })
-    .then(function (userFound) {
-      if (userFound) {
-        const newMessage = models.Message.create({
-          UserId: req.body.userId,
-          title: req.body.title,
-          content: req.body.content,
-          attachment: null,
-          likes: 0,
-        }) // revoir pour intégrer l'ajout d'une image
-
-          .then((newMessage) => {
-            res.status(201).json({ message: "Message enregistré !" });
-          })
-          .catch((err) => {
-            return res.status(500).json({ error: "Erreur d'enregistrement du message." });
-          });
-      } else {
-        res.status(404).json({ error: "Utilisateur non trouvé." });
-      }
+    .then(() => {
+      checkTitleAndContent(req.body.title, req.body.content);
+      models.Message.create({
+        UserId: userId,
+        title: req.body.title,
+        content: req.body.content,
+        attachment: null,
+        likes: 0,
+      }) // revoir pour intégrer l'ajout d'une image
+        .then(() => {
+          return res.status(201).json({ message: "Message enregistré !" });
+        })
+        .catch((err) => {
+          return res.status(500).json({ error: "Erreur d'enregistrement du message." });
+        });
     })
-    .catch(function (err) {
+    .catch((err) => {
       return res.status(500).json({ error: err });
     });
 };
 
 // fonction modification d'un post
 exports.updateMessage = (req, res, next) => {
-  // on bloque si des champs requis sont manquants
-  if (!req.body.title || !req.body.content) {
-    res.status(400).json({ error: "Certains champs ne sont pas remplis." });
-  }
+  // constantes
+  const userId = res.locals.userId;
+  const isAdmin = res.locals.isAdmin;
 
-  // on bloque aussi si les champs renseignés sont trop courts
-  if (req.body.title <= 3 || req.body.content <= 3) {
-    return res.status(400).json({ error: "Le contenu est trop court." });
-  }
-
-  // si c'est ok, on modifie le message
   models.Message.findOne({
     where: { id: req.params.messageId },
   })
-    .then(function (messageFound) {
-      if (messageFound.UserId != req.body.userId) {
-        // modifier le if pour prendre en compte les droits admin
-        res.status(403).json({ error: "utilisateur non autorisé" });
-        return;
+    .then((messageFound) => {
+      if (!isAdmin && messageFound.UserId != userId) {
+        return res.status(403).json({ error: "Utilisateur non autorisé" });
       }
-      if (messageFound) {
-        messageFound
-          .update({
-            title: req.body.title ? req.body.title : messageFound.title,
-            content: req.body.content ? req.body.content : messageFound.content,
-            attachment: req.body.attachment ? req.body.attachment : messageFound.attachment,
-          })
-          .then(function (messageFound) {
-            return res.status(201).json({ message: "Message modifié !" });
-          })
-          .catch(function (err) {
-            res.status(500).json({ error: "échec de la mise à jour du message" });
-          });
-      } else {
-        res.status(404).json({ error: "Message non trouvé." });
-      }
+
+      checkFields(req.body.title, req.body.content);
+
+      messageFound
+        .update({
+          title: req.body.title,
+          content: req.body.content,
+          attachment: req.body.attachment ? req.body.attachment : messageFound.attachment,
+        })
+        .then(() => {
+          return res.status(201).json({ message: "Message modifié !" });
+        })
+        .catch(() => {
+          return res.status(500).json({ error: "Echec de la mise à jour du message" });
+        });
     })
-    .catch(function (err) {
-      return res.status(500).json({ error: err });
+    .catch((err) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      return res.status(500).json({ error: "L'accès au message a échoué." });
     });
 };
 
 // fonction suppression d'un post
 exports.deleteMessage = (req, res, next) => {
+  // constantes
+  const userId = res.locals.userId;
+  const isAdmin = res.locals.isAdmin;
+
   models.Message.findOne({
-    attributes: ["id", "UserId"],
     where: { id: req.params.messageId },
   })
-    .then(function (messageFound) {
-      if (messageFound.UserId != req.body.userId) {
-        // modifier le if pour prendre en compte les droits admin
-        res.status(403).json({ error: "utilisateur non autorisé" });
-        return;
+    .then((messageFound) => {
+      if (!isAdmin && messageFound.UserId != userId) {
+        return res.status(403).json({ error: "Utilisateur non autorisé" });
       }
-      if (messageFound) {
-        messageFound
-          .destroy({ where: { id: req.params.messageId } })
-          .then(function () {
-            return res.status(201).json({ message: "message supprimé !" });
-          })
-          .catch(function (err) {
-            res.status(500).json({ error: "échec de la suppression du message" });
-          });
-      } else {
-        return res.status(404).json({ error: "message non trouvé" });
-      }
+      messageFound
+        .destroy({ where: { id: req.params.messageId } })
+        .then(() => {
+          return res.status(201).json({ message: "Message supprimé !" });
+        })
+        .catch(() => {
+          res.status(500).json({ error: "Echec de la suppression du message" });
+        });
     })
-    .catch(function () {
-      res.status(500).json({ error: "échec de l'accès au message" });
+    .catch(() => {
+      return res.status(500).json({ error: "L'accès au message a échoué." });
     });
 };
