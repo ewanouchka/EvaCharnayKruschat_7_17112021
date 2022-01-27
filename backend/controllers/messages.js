@@ -27,7 +27,7 @@ exports.getMessages = (req, res, next) => {
   // constantes
   const userId = res.locals.userId;
   const isAdmin = res.locals.isAdmin;
-  const limit = parseInt(req.query.limit);
+  //const limit = parseInt(req.query.limit); voir si on intègre la modif de la limite ou pas
   const offset = parseInt(req.query.offset);
   const order = req.query.order;
 
@@ -107,7 +107,7 @@ exports.sendMessage = (req, res, next) => {
     where: { id: userId },
   })
     .then(() => {
-      checkTitleAndContent(req.body.title, req.body.content);
+      checkFields(req.body.title, req.body.content);
       models.Message.create({
         UserId: userId,
         title: req.body.title,
@@ -165,6 +165,7 @@ exports.updateMessage = (req, res, next) => {
 };
 
 // fonction suppression d'un post
+// revoir la suppression des commentaires associés avant de supprimer un post
 exports.deleteMessage = (req, res, next) => {
   // constantes
   const userId = res.locals.userId;
