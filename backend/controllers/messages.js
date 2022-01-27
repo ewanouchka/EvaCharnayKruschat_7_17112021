@@ -26,10 +26,12 @@ const checkFields = (title, content) => {
 exports.getMessages = (req, res, next) => {
   // constantes
   const userId = res.locals.userId;
+  const isAdmin = res.locals.isAdmin;
   const limit = parseInt(req.query.limit);
   const offset = parseInt(req.query.offset);
   const order = req.query.order;
 
+  // route get spécifique à la page d'accueil : on affiche les trois derniers posts du user
   if (req.headers.welcome) {
     models.Message.findAll({
       where: { UserId: userId },
@@ -52,10 +54,12 @@ exports.getMessages = (req, res, next) => {
       .catch(() => {
         return res.status(500).json({ error: "La demande est incorrecte." });
       });
-  } else {
+  }
+  // route get générale pour l'affichage du thread complet
+  else {
     models.Message.findAll({
       order: [order != null ? order.split(":") : ["createdAt", "DESC"]],
-      limit: !isNaN(limit) ? limit : 10,
+      limit: 10,
       offset: !isNaN(offset) ? offset : 0,
       include: [
         {
@@ -66,7 +70,8 @@ exports.getMessages = (req, res, next) => {
     })
       .then((messages) => {
         if (messages) {
-          return res.status(200).json(messages);
+          // on retourne les messages, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
+          return res.status(200).json({ messages: messages, isAdmin: isAdmin });
         } else {
           return res.status(404).json({ error: "Aucun message trouvé." });
         }
