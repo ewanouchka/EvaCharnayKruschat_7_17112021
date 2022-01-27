@@ -12,15 +12,27 @@
         </h3>
         <p>{{ item.content }}</p>
         <div class="post-options">
-          <i class="fas fa-reply post-options__icons"></i>
+          <router-link
+            :to="{ name: 'PostDetail', params: { messageId: item.id } }"
+          >
+            <i class="fas fa-reply post-options__icons"></i>
+          </router-link>
           <span v-if="showActions(item.UserId, userId, isAdmin) === true">
-            <i class="fas fa-pencil-alt post-options__icons"></i>
-            <i class="fas fa-trash-alt post-options__icons"></i>
+            <router-link
+              :to="{ name: 'EditPost', params: { messageId: item.id } }"
+            >
+              <i class="fas fa-pencil-alt post-options__icons"></i>
+            </router-link>
+            <i
+              @click.prevent="deletePost(item.id)"
+              class="fas fa-trash-alt post-options__icons"
+            ></i>
           </span>
         </div>
         <div class="post-likes">
           <i class="fas fa-heart"></i> {{ item.likes }}
         </div>
+        <div class="post-comments">voir les commentaires</div>
       </li>
     </ul>
 
@@ -36,7 +48,7 @@
 <script>
 // ajouter bouton page suivante pour offset suivant/précédent
 // ajouter fonction like + anim coeur
-// ajouter boutons modifier/supprimer + fonctions backend
+// ajouter boutons modifier/supprimer
 // voir les droits admins pour ces fonctions modif/suppr
 import Popup from "@/components/Popup.vue";
 
@@ -48,20 +60,30 @@ export default {
   data() {
     return {
       isPopupVisible: false,
-      isLoggedIn: true,
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
+      isLoggedIn: true,
       messages: "La liste de messages est vide",
+      reqSent: false,
+      isAdmin: false,
     };
   },
   methods: {
     showPopup(newMessage, newDetail) {
+      console.log("showpopup");
       this.isPopupVisible = true;
+      console.log(this.isPopupVisible);
       this.msg = newMessage;
       this.detail = newDetail;
+      console.log(this.msg);
+      console.log(this.detail);
     },
     closePopup() {
       this.isPopupVisible = false;
+      if (this.reqSent) {
+        console.log(this.reqSent);
+        window.location.reload();
+      }
       if (this.isLoggedIn == false) {
         localStorage.removeItem("userAuth");
         window.location.replace("/");
@@ -82,19 +104,24 @@ export default {
           });
 
           const postsJSON = await posts.json();
+          console.log(postsJSON);
+          this.isAdmin = postsJSON.isAdmin;
+          console.log(this.isAdmin);
 
-          if (postsJSON.error) {
+          /*if (postsJSON.error) {
+            console.log("if postJSON.error");
+            console.log(this.showPopup());
             this.isLoggedIn = false;
             this.showPopup(
               `Erreur : ${postsJSON.error}`,
               "Votre session a peut-être expiré ? Essayez de vous reconnecter."
             );
-          }
+          }*/
 
-          if (postsJSON) {
+          if (postsJSON.messages) {
             // voir une méthode js pour le faire en direct
 
-            for (const message of postsJSON) {
+            for (const message of postsJSON.messages) {
               const postDate = new Date(message.createdAt);
               const dateOptions = {
                 weekday: "short",
@@ -108,9 +135,17 @@ export default {
               );
             }
 
-            this.messages = postsJSON;
+            this.messages = postsJSON.messages;
           }
         } catch (error) {
+          console.log("On arrive là (catch error) ?");
+          console.log(
+            this.showPopup(
+              "Impossible d'accéder au fil d'actualité.",
+              `${error}.`
+            )
+          );
+
           this.showPopup(
             "Impossible d'accéder au fil d'actualité.",
             `${error}.`
@@ -118,26 +153,47 @@ export default {
         }
       })();
     },
-    showActions(postUser, userId, isAdmin) {
-      isAdmin = false;
-      console.log("postUser");
-      console.log(postUser);
-      console.log("userId");
-      console.log(userId);
-      console.log("isAdmin");
-      console.log(isAdmin);
-      // route pour fetch dans le token utilisateur l'info admin ?
+    showActions(postUserId, userId, isAdmin) {
       if (isAdmin === true) {
         return true;
       }
 
-      if (postUser === userId) {
+      if (postUserId === userId) {
         return true;
-      } /*
+      }
+    },
+    deletePost(messageId) {
+      (async () => {
+        try {
+          const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
 
-      if (postUser !== userId) {
-        return false;
-      }*/
+          const deletionSent = await fetch(
+            `http://localhost:3000/api/messages/${messageId}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
+          const deletionBackSent = await deletionSent.json();
+
+          if (deletionBackSent.error) {
+            this.showPopup(
+              "Une erreur est survenue :",
+              `${deletionBackSent.error}`
+            );
+          } else {
+            // voir pour faire un popup de confirmation avant suppression
+            // revoir avec suppression des commentaires associés avant la suppression du message
+            this.reqSent = true;
+            this.showPopup("Message supprimé !", "");
+          }
+        } catch (error) {
+          this.showPopup("Une erreur est survenue :", `${error}`);
+        }
+      })();
     },
   },
   beforeMount() {
@@ -186,8 +242,17 @@ p {
 }
 .post-options__icons {
   margin: 0 0.75rem 0 0;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    color: var(--color-secondary);
+  }
 }
 .post-likes {
   margin: 0 1rem 0.25rem 0;
+  visibility: hidden;
+}
+.post-comments {
+  width: 100%;
 }
 </style>

@@ -4,6 +4,8 @@ import Home from "../views/Home.vue";
 import Signup from "../views/Signup.vue";
 import Profile from "../views/Profile.vue";
 import Thread from "../views/Thread.vue";
+import EditPost from "../views/EditPost.vue";
+import PostDetail from "../views/PostDetail.vue";
 import Error404 from "../views/Error404.vue";
 
 const checkAuth = () => {
@@ -38,6 +40,29 @@ const routes = [
     path: "/thread",
     name: "Thread",
     component: Thread,
+    beforeEnter: (to, from, next) => {
+      if (checkAuth()) {
+        console.log("on est logué");
+        next();
+      } else {
+        console.log("on n'est pas logué");
+        next({ name: "Home" });
+      }
+    },
+  },
+  {
+    path: "/editpost/?messageId=:messageId",
+    name: "EditPost",
+    component: EditPost,
+    beforeEnter: (to, from, next) => {
+      if (checkAuth()) next();
+      else next({ name: "Home" });
+    },
+  },
+  {
+    path: "/messages/?messageId=:messageId",
+    name: "PostDetail",
+    component: PostDetail,
     beforeEnter: (to, from, next) => {
       if (checkAuth()) next();
       else next({ name: "Home" });
