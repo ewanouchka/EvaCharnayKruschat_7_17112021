@@ -24,26 +24,68 @@ const checkFields = (title, content) => {
 
 // fonction accès aux posts
 exports.getMessages = (req, res, next) => {
+  // constantes
+  const userId = res.locals.userId;
   const limit = parseInt(req.query.limit);
   const offset = parseInt(req.query.offset);
   const order = req.query.order;
 
-  models.Message.findAll({
-    order: [order != null ? order.split(":") : ["createdAt", "DESC"]],
-    limit: !isNaN(limit) ? limit : 10,
-    offset: !isNaN(offset) ? offset : 0,
-    include: [
-      {
-        model: models.User,
-        attributes: ["first_name", "last_name"],
-      },
-    ],
+  if (req.headers.welcome) {
+    models.Message.findAll({
+      where: { UserId: userId },
+      order: [["createdAt", "DESC"]],
+      limit: 3,
+      include: [
+        {
+          model: models.User,
+          attributes: ["first_name", "last_name"],
+        },
+      ],
+    })
+      .then((messages) => {
+        if (messages) {
+          return res.status(200).json(messages);
+        } else {
+          return res.status(404).json({ error: "Aucun message trouvé." });
+        }
+      })
+      .catch(() => {
+        return res.status(500).json({ error: "La demande est incorrecte." });
+      });
+  } else {
+    models.Message.findAll({
+      order: [order != null ? order.split(":") : ["createdAt", "DESC"]],
+      limit: !isNaN(limit) ? limit : 10,
+      offset: !isNaN(offset) ? offset : 0,
+      include: [
+        {
+          model: models.User,
+          attributes: ["first_name", "last_name"],
+        },
+      ],
+    })
+      .then((messages) => {
+        if (messages) {
+          return res.status(200).json(messages);
+        } else {
+          return res.status(404).json({ error: "Aucun message trouvé." });
+        }
+      })
+      .catch(() => {
+        return res.status(500).json({ error: "La demande est incorrecte." });
+      });
+  }
+};
+
+exports.getOneMessage = (req, res, next) => {
+  models.Message.findOne({
+    where: { id: req.params.messageId },
   })
-    .then((messages) => {
-      if (messages) {
-        return res.status(200).json(messages);
+    .then((message) => {
+      if (message) {
+        return res.status(200).json(message);
       } else {
-        return res.status(404).json({ error: "Aucun message trouvé." });
+        return res.status(404).json({ error: "Le message n'a pas été trouvé." });
       }
     })
     .catch(() => {
