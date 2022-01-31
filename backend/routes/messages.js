@@ -10,6 +10,7 @@ const messageCtrl = require("../controllers/messages");
 
 // on crée les routes
 router.get("/", auth, messageCtrl.getMessages);
+router.get("/users/:userId", auth, messageCtrl.getMessages);
 router.get("/:messageId", auth, messageCtrl.getOneMessage);
 router.post("/", auth, messageCtrl.sendMessage);
 router.put("/:messageId", auth, messageCtrl.updateMessage);
