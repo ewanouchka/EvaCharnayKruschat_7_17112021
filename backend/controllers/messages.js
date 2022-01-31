@@ -1,3 +1,6 @@
+// import opérateur sequelize
+const { Op } = require("sequelize");
+
 // import des models
 const models = require("../db/models");
 
@@ -25,61 +28,33 @@ const checkFields = (title, content) => {
 // fonction accès aux posts
 exports.getMessages = (req, res, next) => {
   // constantes
-  const userId = res.locals.userId;
   const isAdmin = res.locals.isAdmin;
-  //const limit = parseInt(req.query.limit); voir si on intègre la modif de la limite ou pas
+  const userId = parseInt(req.params.userId);
   const offset = parseInt(req.query.offset);
-  const order = req.query.order;
 
-  // route get spécifique à la page d'accueil : on affiche les trois derniers posts du user
-  if (req.headers.welcome) {
-    models.Message.findAll({
-      where: { UserId: userId },
-      order: [["createdAt", "DESC"]],
-      limit: 3,
-      include: [
-        {
-          model: models.User,
-          attributes: ["first_name", "last_name"],
-        },
-      ],
+  models.Message.findAll({
+    where: { UserId: userId ? userId : { [Op.not]: null } },
+    order: [["createdAt", "DESC"]],
+    limit: Number.isFinite(userId) ? 3 : 10,
+    offset: !isNaN(offset) ? offset : 0,
+    include: [
+      {
+        model: models.User,
+        attributes: ["first_name", "last_name"],
+      },
+    ],
+  })
+    .then((messages) => {
+      if (messages) {
+        // on retourne les messages, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
+        return res.status(200).json({ messages: messages, isAdmin: isAdmin });
+      } else {
+        return res.status(404).json({ error: "Aucun message trouvé." });
+      }
     })
-      .then((messages) => {
-        if (messages) {
-          return res.status(200).json(messages);
-        } else {
-          return res.status(404).json({ error: "Aucun message trouvé." });
-        }
-      })
-      .catch(() => {
-        return res.status(500).json({ error: "La demande est incorrecte." });
-      });
-  }
-  // route get générale pour l'affichage du thread complet
-  else {
-    models.Message.findAll({
-      order: [order != null ? order.split(":") : ["createdAt", "DESC"]],
-      limit: 10,
-      offset: !isNaN(offset) ? offset : 0,
-      include: [
-        {
-          model: models.User,
-          attributes: ["first_name", "last_name"],
-        },
-      ],
-    })
-      .then((messages) => {
-        if (messages) {
-          // on retourne les messages, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
-          return res.status(200).json({ messages: messages, isAdmin: isAdmin });
-        } else {
-          return res.status(404).json({ error: "Aucun message trouvé." });
-        }
-      })
-      .catch(() => {
-        return res.status(500).json({ error: "La demande est incorrecte." });
-      });
-  }
+    .catch(() => {
+      return res.status(500).json({ error: "La demande est incorrecte." });
+    });
 };
 
 exports.getOneMessage = (req, res, next) => {
