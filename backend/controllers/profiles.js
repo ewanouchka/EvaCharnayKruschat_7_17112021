@@ -71,11 +71,18 @@ exports.updateUserProfile = (req, res, next) => {
 
 // fonction suppression d'un utilisateur
 exports.deleteUserProfile = (req, res, next) => {
+  // constantes
+  const userId = res.locals.userId;
+  const isAdmin = res.locals.isAdmin;
+
   models.User.findOne({
     attributes: ["id", "password"],
     where: { id: req.params.id },
   })
     .then((userFound) => {
+      if (!isAdmin && userFound.id != userId) {
+        return res.status(403).json({ error: "Utilisateur non autorisé" });
+      }
       bcrypt.compare(req.body.password, userFound.password, (err, resBcrypt) => {
         if (resBcrypt) {
           userFound
