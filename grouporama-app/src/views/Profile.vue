@@ -189,11 +189,15 @@ export default {
     closePopup() {
       this.isPopupVisible = false;
       if (!localStorage.getItem("userAuth")) {
-        window.location.replace("/");
+        this.$router.push({
+          name: "Home",
+        });
       }
       if (this.isLoggedIn == false) {
         localStorage.removeItem("userAuth");
-        window.location.replace("/");
+        this.$router.push({
+          name: "Home",
+        });
       } else {
         this.getUserProfile();
       }
@@ -232,7 +236,7 @@ export default {
             const userId = new URL(location.href).searchParams.get("id");
 
             const updateSent = await fetch(
-              `http://localhost:3000/api/profile/${userId}`,
+              `http://localhost:3000/api/profiles/${userId}`,
               {
                 method: "PUT",
                 body: JSON.stringify({
@@ -305,7 +309,7 @@ export default {
             const userId = new URL(location.href).searchParams.get("id");
 
             const deletionSent = await fetch(
-              `http://localhost:3000/api/profile/${userId}`,
+              `http://localhost:3000/api/profiles/${userId}`,
               {
                 method: "DELETE",
                 body: JSON.stringify({
@@ -348,7 +352,7 @@ export default {
       (async () => {
         try {
           const userProfile = await fetch(
-            `http://localhost:3000/api/profile/${userId}`,
+            `http://localhost:3000/api/profiles/${userId}`,
             {
               method: "GET",
               headers: {
@@ -359,17 +363,19 @@ export default {
           );
 
           const userProfileJSON = await userProfile.json();
-          if (userProfileJSON) {
-            this.userFirstName = userProfileJSON.first_name;
-            this.userLastName = userProfileJSON.last_name;
-            this.userEmail = userProfileJSON.email;
-          }
+
           if (userProfileJSON.error) {
             this.isLoggedIn = false;
             this.showPopup(
               `Erreur : ${userProfileJSON.error}`,
               "Votre session a peut-être expiré ? Essayez de vous reconnecter."
             );
+          }
+
+          if (userProfileJSON) {
+            this.userFirstName = userProfileJSON.first_name;
+            this.userLastName = userProfileJSON.last_name;
+            this.userEmail = userProfileJSON.email;
           }
         } catch (error) {
           this.showPopup(
