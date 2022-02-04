@@ -9,9 +9,9 @@ const auth = require("../middleware/auth");
 const commentCtrl = require("../controllers/comments");
 
 // on crée les routes -- A REVOIR
-router.get("/", auth, commentCtrl.getComments);
-router.post("/", auth, commentCtrl.sendComment);
-router.put("/:commentId", auth, commentCtrl.updateComment);
-router.delete("/:commentId", auth, commentCtrl.deleteComment);
+router.get("/:messageId/comments/", auth, commentCtrl.getComments);
+router.post("/:messageId/comments/", auth, commentCtrl.sendComment);
+router.put("/:messageId/comments/:commentId", auth, commentCtrl.updateComment);
+router.delete("/:messageId/comments/:commentId", auth, commentCtrl.deleteComment);
 
 module.exports = router;
