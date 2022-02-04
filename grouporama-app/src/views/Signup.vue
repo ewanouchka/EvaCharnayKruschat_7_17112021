@@ -9,23 +9,24 @@
     <h1>Enregistrez votre compte utilisateur</h1>
     <p>Veuillez remplir tous les champs</p>
     <form id="signup-form">
-      <label for="Name" class="form-label">Votre nom :</label>
+      <label for="Name" class="form-label"
+        >Votre nom : {{ name.pattern }}</label
+      >
       <input
         placeholder="Dupont"
         name="Name"
-        id="Name"
+        v-model="name"
         class="form-input"
         type="text"
         required
         pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
       />
-      <span class="error-visible" id="error-message-Name"></span>
 
       <label for="Surname" class="form-label">Votre prénom : </label>
       <input
         placeholder="Dominique"
         name="Surname"
-        id="Surname"
+        v-model="surname"
         class="form-input"
         type="text"
         required
@@ -36,7 +37,7 @@
       <input
         placeholder="contact@groupomania.com"
         name="Email"
-        id="Email"
+        v-model="email"
         class="form-input"
         type="email"
         required
@@ -48,7 +49,7 @@
       <input
         placeholder="123456AzErTy*"
         name="Password"
-        id="Password"
+        v-model="password"
         class="form-input"
         type="password"
         required
@@ -61,7 +62,7 @@
       <input
         placeholder="123456AzErTy*"
         name="Repeat-Password"
-        id="Repeat-Password"
+        v-model="repeatedPassword"
         class="form-input"
         type="password"
         required
@@ -94,6 +95,12 @@ export default {
       isPopupVisible: false,
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
+      name: "",
+      surname: "",
+      email: "",
+      password: "",
+      repeatedPassword: "",
+      inputValidity: false,
     };
   },
   methods: {
@@ -105,32 +112,62 @@ export default {
     closePopup() {
       this.isPopupVisible = false;
       if (localStorage.getItem("userAuth")) {
-        window.location = "../";
+        this.$router.push({
+          name: "Home",
+        });
+        this.$router.go();
+      }
+    },
+    checkTextValidity(text, pattern) {
+      // on supprime les espaces au début et à la fin de la chaîne
+      text = text.trim();
+      // on bloque si des champs requis sont manquants
+      if (!text || text.length <= 3 || !pattern.test(text)) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    checkValiditySignup() {
+      // constantes pattern de validation
+      const nameRegex = new RegExp(
+        `^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$`
+      );
+      const emailRegex = new RegExp(
+        `^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$`
+      );
+      const passwordRegex = new RegExp(
+        `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\\d@$!%*?&()_+=-]{8,}$`
+      );
+
+      if (
+        !this.checkTextValidity(this.name, nameRegex) ||
+        !this.checkTextValidity(this.surname, nameRegex) ||
+        !this.checkTextValidity(this.email, emailRegex) ||
+        !this.checkTextValidity(this.password, passwordRegex) ||
+        !this.checkTextValidity(this.repeatedPassword, passwordRegex)
+      ) {
+        this.inputValidity = false;
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "Assurez-vous que tous les champs sont correctement renseignés :\n- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-)."
+        );
+        return;
+      }
+      if (this.password !== this.repeatedPassword) {
+        this.inputValidity = false;
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "- Le mot de passe ressaisi doit être identique au premier."
+        );
+      } else {
+        this.inputValidity = true;
       }
     },
     signupSubmit() {
-      const inputValues = document.querySelectorAll(".form-input");
-      const getInputValue = (inputId) => {
-        const inputValue = document.querySelector(`#${inputId}`).value;
-        return inputValue;
-      };
+      this.checkValiditySignup();
 
-      const checkAllValidity = () => {
-        let validity = true;
-        if (getInputValue("Password") !== getInputValue("Repeat-Password")) {
-          validity = false;
-        }
-        for (const inputValue of inputValues) {
-          if (inputValue.validity.valid == false) {
-            validity = false;
-            inputValue.classList.add("input-invalid");
-          }
-        }
-        return validity;
-      };
-      checkAllValidity();
-
-      if (checkAllValidity()) {
+      if (this.inputValidity) {
         (async () => {
           try {
             const signupSent = await fetch(
@@ -138,10 +175,10 @@ export default {
               {
                 method: "POST",
                 body: JSON.stringify({
-                  first_name: getInputValue("Surname"),
-                  last_name: getInputValue("Name"),
-                  email: getInputValue("Email"),
-                  password: getInputValue("Password"),
+                  first_name: this.surname,
+                  last_name: this.name,
+                  email: this.email,
+                  password: this.password,
                 }),
                 headers: {
                   "Content-Type": "application/json",
@@ -172,11 +209,6 @@ export default {
             );
           }
         })();
-      } else {
-        this.showPopup(
-          "Les informations saisies ne sont pas valides.",
-          "Assurez-vous que tous les champs sont correctement renseignés :\n- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe ressaisi doit être identique au premier."
-        );
       }
     },
   },
