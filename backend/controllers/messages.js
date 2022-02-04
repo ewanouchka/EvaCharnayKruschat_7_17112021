@@ -6,23 +6,26 @@ const models = require("../db/models");
 
 // fonctions de vérification des champs des requêtes
 const checkTextValidity = (text) => {
-  // on bloque si des champs requis sont manquants
-  if (!text) {
-    throw "Certains champs ne sont pas remplis.";
-  }
-
   // on supprime les espaces au début et à la fin de la chaîne
   text = text.trim();
 
-  // on bloque aussi si les champs renseignés sont trop courts
-  if (text.length <= 3) {
-    throw "Le contenu est trop court.";
+  // on bloque si des champs requis sont manquants
+  if (!text || text.length <= 3) {
+    return text, false;
+  } else {
+    return text, true;
   }
 };
 
-const checkFields = (title, content) => {
-  checkTextValidity(title);
-  checkTextValidity(content);
+const checkValidityPost = (title, content) => {
+  if (!checkTextValidity(title) || !checkTextValidity(content)) {
+    throw "La requête n'est pas valide.";
+  } else return title, content;
+};
+const checkValidityEdit = (title, content) => {
+  if (!checkTextValidity(title) && !checkTextValidity(content)) {
+    throw "La requête n'est pas valide.";
+  } else return title, content;
 };
 
 // fonction accès aux posts
@@ -58,12 +61,33 @@ exports.getMessages = (req, res, next) => {
 };
 
 exports.getOneMessage = (req, res, next) => {
+  // constantes
+  const isAdmin = res.locals.isAdmin;
+  console.log(req.params.messageId);
+  console.log(req.route.path);
+
   models.Message.findOne({
     where: { id: req.params.messageId },
+    include: [
+      {
+        model: models.User,
+        attributes: ["first_name", "last_name"],
+      },
+      {
+        model: models.Comment,
+        include: [
+          {
+            model: models.User,
+            attributes: ["first_name", "last_name"],
+          },
+        ],
+      },
+    ],
   })
     .then((message) => {
       if (message) {
-        return res.status(200).json(message);
+        // on retourne les messages, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
+        return res.status(200).json({ message: message, isAdmin: isAdmin });
       } else {
         return res.status(404).json({ error: "Le message n'a pas été trouvé." });
       }
@@ -82,7 +106,7 @@ exports.sendMessage = (req, res, next) => {
     where: { id: userId },
   })
     .then(() => {
-      checkFields(req.body.title, req.body.content);
+      checkValidityPost(req.body.title, req.body.content);
       models.Message.create({
         UserId: userId,
         title: req.body.title,
@@ -116,12 +140,12 @@ exports.updateMessage = (req, res, next) => {
         return res.status(403).json({ error: "Utilisateur non autorisé" });
       }
 
-      checkFields(req.body.title, req.body.content);
+      checkValidityEdit(req.body.title, req.body.content);
 
       messageFound
         .update({
-          title: req.body.title,
-          content: req.body.content,
+          title: req.body.title ? req.body.title : messageFound.title,
+          content: req.body.content ? req.body.content : messageFound.content,
           attachment: req.body.attachment ? req.body.attachment : messageFound.attachment,
         })
         .then(() => {
