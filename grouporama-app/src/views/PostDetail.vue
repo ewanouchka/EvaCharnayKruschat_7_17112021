@@ -6,22 +6,24 @@
         src="../assets/icon-left-font.svg"
         class="post-detail__logo"
     /></router-link>
-    <h1>Un message</h1>
-
     <section id="Review"><Review /></section>
-    <section id="Comments"><Comments /></section>
+    <h2>Commenter</h2>
+    <section id="Comment-Editor"><CommentEditor /></section>
+    <router-link to="/thread" class="back-to-thread"
+      >Retour au fil d'actualité</router-link
+    >
   </div>
 </template>
 
 <script>
 import Review from "@/components/Review.vue";
-import Comments from "@/components/Comments.vue";
+import CommentEditor from "@/components/CommentEditor.vue";
 
 export default {
   name: "EditPost",
   components: {
     Review,
-    Comments,
+    CommentEditor,
   },
   data: function () {
     return {};
@@ -44,13 +46,8 @@ export default {
   object-fit: cover;
 }
 
-.post-detail h1 {
-  margin: 0;
-  align-self: center;
-  flex: 1;
-}
-
-.post-detail section {
+.post-detail section,
+.back-to-thread {
   width: 100%;
 }
 
@@ -78,9 +75,6 @@ export default {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-  }
-  .post-detail h1 {
-    width: 100%;
   }
   .post-detail button {
     margin: 0 1rem 1rem 1rem;
