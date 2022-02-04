@@ -136,7 +136,7 @@ button {
 }
 
 .main-section {
-  height: calc(
+  min-height: calc(
     100vh - var(--header-size) - var(--footer-size) - 4 *
       var(--padding-top-bottom)
   );
@@ -168,6 +168,10 @@ button {
 .input-invalid {
   background: var(--color-secondary-transparent);
   border: 1px solid var(--color-secondary);
+}
+
+.bottom-link {
+  width: 100%;
 }
 
 footer {
