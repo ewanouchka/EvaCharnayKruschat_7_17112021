@@ -19,9 +19,12 @@ const checkTextValidity = (text) => {
 
 // fonction accès aux posts
 exports.getComments = (req, res, next) => {
+  // constantes
+  const isAdmin = res.locals.isAdmin;
+
   models.Comment.findAll({
     order: [["createdAt", "ASC"]],
-    where: { MessageId: req.body.messageId },
+    where: { MessageId: req.params.messageId },
     include: [
       {
         model: models.User,
@@ -31,7 +34,8 @@ exports.getComments = (req, res, next) => {
   })
     .then((comments) => {
       if (comments) {
-        return res.status(200).json(comments);
+        // on retourne les commentaires, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
+        return res.status(200).json({ commentaires: comments, isAdmin: isAdmin });
       } else {
         return res.status(404).json({ error: "Aucun commentaire trouvé." });
       }
@@ -47,14 +51,14 @@ exports.sendComment = (req, res, next) => {
   const userId = res.locals.userId;
 
   models.Message.findOne({
-    where: { id: req.body.messageId },
+    where: { id: req.params.messageId },
   })
     .then(() => {
       checkTextValidity(req.body.content);
 
       models.Comment.create({
         UserId: userId,
-        MessageId: req.body.messageId,
+        MessageId: req.params.messageId,
         content: req.body.content,
         likes: 0,
       })
