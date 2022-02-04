@@ -13,12 +13,14 @@
         <p>{{ item.content }}</p>
         <div class="post-options">
           <router-link
+            title="répondre au message"
             :to="{ name: 'PostDetail', params: { messageId: item.id } }"
           >
             <i class="fas fa-reply post-options__icons"></i>
           </router-link>
-          <span v-if="showActions(item.UserId, userId, isAdmin) === true">
+          <span v-if="showActions(item.UserId, isAdmin) === true">
             <router-link
+              title="éditer le message"
               :to="{ name: 'EditPost', params: { messageId: item.id } }"
             >
               <i class="fas fa-pencil-alt post-options__icons"></i>
@@ -26,13 +28,10 @@
             <i
               @click.prevent="deletePost(item.id)"
               class="fas fa-trash-alt post-options__icons"
+              title="supprimer le message"
             ></i>
           </span>
         </div>
-        <div class="post-likes">
-          <i class="fas fa-heart"></i> {{ item.likes }}
-        </div>
-        <div class="post-comments">voir les commentaires</div>
       </li>
     </ul>
 
@@ -47,9 +46,6 @@
 
 <script>
 // ajouter bouton page suivante pour offset suivant/précédent
-// ajouter fonction like + anim coeur
-// ajouter boutons modifier/supprimer
-// voir les droits admins pour ces fonctions modif/suppr
 import Popup from "@/components/Popup.vue";
 
 export default {
@@ -63,7 +59,7 @@ export default {
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
       isLoggedIn: true,
-      messages: "La liste de messages est vide",
+      messages: "",
       reqSent: false,
       isAdmin: false,
     };
@@ -72,26 +68,24 @@ export default {
     showPopup(newMessage, newDetail) {
       console.log("showpopup");
       this.isPopupVisible = true;
-      console.log(this.isPopupVisible);
       this.msg = newMessage;
       this.detail = newDetail;
-      console.log(this.msg);
-      console.log(this.detail);
     },
     closePopup() {
       this.isPopupVisible = false;
       if (this.reqSent) {
-        console.log(this.reqSent);
-        window.location.reload();
+        this.$router.push({
+          name: "Thread",
+        });
       }
       if (this.isLoggedIn == false) {
         localStorage.removeItem("userAuth");
-        window.location.replace("/");
+        this.$router.push({
+          name: "Home",
+        });
       }
     },
     getPosts() {
-      const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
-      this.userId = userId;
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
       (async () => {
         try {
@@ -119,8 +113,6 @@ export default {
           }*/
 
           if (postsJSON.messages) {
-            // voir une méthode js pour le faire en direct
-
             for (const message of postsJSON.messages) {
               const postDate = new Date(message.createdAt);
               const dateOptions = {
@@ -153,7 +145,9 @@ export default {
         }
       })();
     },
-    showActions(postUserId, userId, isAdmin) {
+    showActions(postUserId, isAdmin) {
+      const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+      //this.userId = userId;
       if (isAdmin === true) {
         return true;
       }
@@ -239,6 +233,9 @@ p {
 }
 .post-options {
   margin: 0 0 0.25rem 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
 .post-options__icons {
   margin: 0 0.75rem 0 0;
@@ -247,12 +244,5 @@ p {
   &:hover {
     color: var(--color-secondary);
   }
-}
-.post-likes {
-  margin: 0 1rem 0.25rem 0;
-  visibility: hidden;
-}
-.post-comments {
-  width: 100%;
 }
 </style>
