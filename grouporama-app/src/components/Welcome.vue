@@ -4,8 +4,13 @@
     <div>
       Vos dernières participations :
 
-      <ul class="actu-container">
+      <ul v-if="messages === ''" class="actu-container">
+        <li>Vous n'avez pas encore de participation.</li>
+      </ul>
+
+      <ul v-else class="actu-container">
         <li class="actu-bloc" v-for="item in messages" :key="item.id">
+          Voir 2
           <h2>{{ item.title }}</h2>
           <h3>
             par <span v-html="item.User.first_name"></span>&nbsp;<span
@@ -15,9 +20,6 @@
             <span v-html="item.createdAt"></span>
           </h3>
           <p>{{ item.content }}</p>
-          <div class="post-likes">
-            <i class="fas fa-heart"></i> {{ item.likes }}
-          </div>
         </li>
       </ul>
 
@@ -44,7 +46,7 @@ export default {
     return {
       welcome: "Bienvenue",
       authentifiedUser: this.userSurname,
-      messages: "La liste de messages est vide",
+      messages: "",
       isPopupVisible: false,
       isLoggedIn: true,
       msg: "Aïe... le message est vide",
@@ -53,41 +55,36 @@ export default {
   },
   methods: {
     showPopup(newMessage, newDetail) {
-      console.log("showpopup");
       this.isPopupVisible = true;
-      console.log(this.isPopupVisible);
       this.msg = newMessage;
       this.detail = newDetail;
-      console.log(this.msg);
-      console.log(this.detail);
     },
     closePopup() {
       this.isPopupVisible = false;
       if (this.isLoggedIn == false) {
         localStorage.removeItem("userAuth");
-        window.location.replace("/");
+        this.$router.go();
       }
     },
     getPosts() {
       const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
-      this.userId = userId;
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
       (async () => {
         try {
-          const posts = await fetch(`http://localhost:3000/api/messages/`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userToken}`,
-              Welcome: true,
-            },
-          });
+          const posts = await fetch(
+            `http://localhost:3000/api/messages/users/${userId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
 
           const postsJSON = await posts.json();
 
           if (postsJSON.error) {
-            console.log("if postJSON.error");
-            console.log(this.showPopup());
             this.isLoggedIn = false;
             this.showPopup(
               `Erreur : ${postsJSON.error}`,
@@ -95,8 +92,8 @@ export default {
             );
           }
 
-          if (postsJSON) {
-            for (const message of postsJSON) {
+          if (postsJSON.messages.length > 0) {
+            for (const message of postsJSON.messages) {
               const postDate = new Date(message.createdAt);
               const dateOptions = {
                 weekday: "short",
@@ -110,17 +107,9 @@ export default {
               );
             }
 
-            this.messages = postsJSON;
+            this.messages = postsJSON.messages;
           }
         } catch (error) {
-          console.log("On arrive là (catch error) ?");
-          console.log(
-            this.showPopup(
-              "Impossible d'accéder au fil d'actualité.",
-              `${error}.`
-            )
-          );
-
           this.showPopup(
             "Impossible d'accéder au fil d'actualité.",
             `${error}.`
@@ -135,7 +124,7 @@ export default {
       (async () => {
         try {
           const userProfile = await fetch(
-            `http://localhost:3000/api/profile/${userId}`,
+            `http://localhost:3000/api/profiles/${userId}`,
             {
               method: "GET",
               headers: {
@@ -152,7 +141,10 @@ export default {
             return;
           }
         } catch (error) {
-          console.log("impossible d'accéder au profil utilisateur");
+          this.showPopup(
+            "Impossible d'accéder au profil utilisateur.",
+            `${error}.`
+          );
         }
       })();
     },
