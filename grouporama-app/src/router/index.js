@@ -42,10 +42,8 @@ const routes = [
     component: Thread,
     beforeEnter: (to, from, next) => {
       if (checkAuth()) {
-        console.log("on est logué");
         next();
       } else {
-        console.log("on n'est pas logué");
         next({ name: "Home" });
       }
     },
@@ -60,7 +58,7 @@ const routes = [
     },
   },
   {
-    path: "/messages/?messageId=:messageId",
+    path: "/messages/:messageId",
     name: "PostDetail",
     component: PostDetail,
     beforeEnter: (to, from, next) => {
