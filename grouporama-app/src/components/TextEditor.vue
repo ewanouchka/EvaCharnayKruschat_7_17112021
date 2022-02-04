@@ -12,6 +12,7 @@
           id="Title"
           type="text"
           class="post-input"
+          v-model="postTitle"
           required
         />
         <label for="Post"
@@ -24,6 +25,7 @@
           id="Content"
           rows="5"
           class="post-input"
+          v-model="postContent"
           required
         />
       </div>
@@ -55,6 +57,7 @@
 
 <script>
 import Popup from "@/components/Popup.vue";
+
 export default {
   name: "TextEditor",
   components: {
@@ -67,6 +70,9 @@ export default {
       detail: "Aïe... le détail est vide",
       postSent: false,
       contextPost: "Rien",
+      postTitle: "",
+      postContent: "",
+      inputValidity: false,
     };
   },
   methods: {
@@ -74,9 +80,12 @@ export default {
       const pathName = window.location.pathname;
       if (pathName === "/thread") {
         this.contextPost = "postSubmit";
+        this.postTitle = "";
+        this.postContent = "";
       }
       if (pathName === "/editpost/") {
         this.contextPost = "postEdit";
+        this.getOriginalText();
       }
     },
     showPopup(newMessage, newDetail) {
@@ -87,30 +96,73 @@ export default {
     closePopup() {
       this.isPopupVisible = false;
       if (this.postSent) {
-        console.log(this.postSent);
-        window.location.replace("/thread");
+        this.$router.push({
+          name: "PostDetail",
+          params: { messageId: `${this.messageId}` },
+        });
       }
     },
-    postSubmit() {
-      const inputValues = document.querySelectorAll(".post-input");
-      const getInputValue = (inputId) => {
-        const inputValue = document.querySelector(`#${inputId}`).value;
-        return inputValue;
-      };
+    getOriginalText() {
+      const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
+      const messageId = new URL(location.href).searchParams.get("messageId");
+      (async () => {
+        try {
+          const oneMessage = await fetch(
+            `http://localhost:3000/api/messages/${messageId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
 
-      const checkAllValidity = () => {
-        let validity = true;
-        for (const inputValue of inputValues) {
-          if (inputValue.validity.valid == false) {
-            validity = false;
-            inputValue.classList.add("input-invalid");
-          }
+          const oneMessageBack = await oneMessage.json();
+
+          this.postTitle = oneMessageBack.title;
+          this.postContent = oneMessageBack.content;
+        } catch (error) {
+          this.showPopup("Impossible d'accéder au message.", `${error}.`);
         }
-        return validity;
-      };
-      checkAllValidity();
+      })();
+    },
+    checkTextValidity(text) {
+      // on supprime les espaces au début et à la fin de la chaîne
+      text = text.trim();
 
-      if (checkAllValidity()) {
+      // on bloque si des champs requis sont manquants
+      if (!text || text.length <= 3) {
+        return false;
+      } else {
+        return true;
+      }
+    },
+    checkValidityPost() {
+      if (
+        !this.checkTextValidity(this.postTitle) ||
+        !this.checkTextValidity(this.postContent)
+      ) {
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le titre et le contenu doivent comporter au moins 3 caractères autres que des espaces.`
+        );
+      } else this.inputValidity = true;
+    },
+    checkValidityEdit() {
+      if (
+        !this.checkTextValidity(this.postTitle) &&
+        !this.checkTextValidity(this.postContent)
+      ) {
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le titre et le contenu doivent comporter au moins 3 caractères autres que des espaces.`
+        );
+      } else this.inputValidity = true;
+    },
+    postSubmit() {
+      this.checkValidityPost();
+      if (this.inputValidity) {
         (async () => {
           try {
             const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
@@ -118,11 +170,11 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const postSent = await fetch("http://localhost:3000/api/messages", {
+            await fetch("http://localhost:3000/api/messages", {
               method: "POST",
               body: JSON.stringify({
-                title: getInputValue("Title"),
-                content: getInputValue("Content"),
+                title: this.postTitle,
+                content: this.postContent,
                 attachment: null,
               }),
               headers: {
@@ -130,10 +182,7 @@ export default {
                 Authorization: `Bearer ${userToken}`,
               },
             });
-            console.log(postSent);
 
-            const postBackSent = await postSent.json();
-            console.log(postBackSent);
             this.postSent = true;
 
             this.showPopup("Votre message est enregistré", ``);
@@ -141,37 +190,13 @@ export default {
             this.showPopup("Une erreur est survenue :", `${error}`);
           }
         })();
-      } else {
-        this.showPopup(
-          "Les informations saisies ne sont pas valides.",
-          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le titre et le contenu doivent comporter au moins 3 caractères.`
-        );
       }
     },
     postEdit() {
-      const inputValues = document.querySelectorAll(".post-input");
-      const getInputValue = (inputId) => {
-        const inputValue = document.querySelector(`#${inputId}`).value;
-        return inputValue;
-      };
-
-      const checkAllValidity = () => {
-        let validity = true;
-        for (const inputValue of inputValues) {
-          if (inputValue.validity.valid == false) {
-            validity = false;
-            inputValue.classList.add("input-invalid");
-          }
-        }
-        return validity;
-      };
-      checkAllValidity();
-
-      if (checkAllValidity()) {
+      this.checkValidityEdit();
+      if (this.inputValidity) {
         (async () => {
           try {
-            const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
-            this.userId = userId;
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
@@ -179,25 +204,20 @@ export default {
               "messageId"
             );
             this.messageId = messageId;
-            const postSent = await fetch(
-              `http://localhost:3000/api/messages/${messageId}`,
-              {
-                method: "PUT",
-                body: JSON.stringify({
-                  title: getInputValue("Title"),
-                  content: getInputValue("Content"),
-                  attachment: null,
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${userToken}`,
-                },
-              }
-            );
-            console.log(postSent);
 
-            const postBackSent = await postSent.json();
-            console.log(postBackSent);
+            await fetch(`http://localhost:3000/api/messages/${messageId}`, {
+              method: "PUT",
+              body: JSON.stringify({
+                title: this.postTitle,
+                content: this.postContent,
+                attachment: null,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            });
+
             this.postSent = true;
 
             this.showPopup("Votre modification est enregistrée", ``);
