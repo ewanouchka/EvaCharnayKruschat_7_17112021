@@ -25,7 +25,9 @@ const checkValidityPost = (title, content) => {
 const checkValidityEdit = (title, content) => {
   if (!checkTextValidity(title) && !checkTextValidity(content)) {
     throw "La requête n'est pas valide.";
-  } else return title, content;
+  } else {
+    return title, content;
+  }
 };
 
 // fonction accès aux posts
@@ -38,8 +40,8 @@ exports.getMessages = (req, res, next) => {
   models.Message.findAll({
     where: { UserId: userId ? userId : { [Op.not]: null } },
     order: [["createdAt", "DESC"]],
-    limit: Number.isFinite(userId) ? 3 : 10,
-    offset: !isNaN(offset) ? offset : 0,
+    limit: Number.isFinite(userId) ? 3 : null, // on pourra ajouter une limite pour fonction de pagination à l'avenir
+    offset: !isNaN(offset) ? offset : 0, // on pourra ajouter une fonction de pagination à l'avenir
     include: [
       {
         model: models.User,
@@ -63,8 +65,6 @@ exports.getMessages = (req, res, next) => {
 exports.getOneMessage = (req, res, next) => {
   // constantes
   const isAdmin = res.locals.isAdmin;
-  console.log(req.params.messageId);
-  console.log(req.route.path);
 
   models.Message.findOne({
     where: { id: req.params.messageId },
@@ -83,6 +83,7 @@ exports.getOneMessage = (req, res, next) => {
         ],
       },
     ],
+    order: [[{ model: models.Comment }, "createdAt", "ASC"]],
   })
     .then((message) => {
       if (message) {
@@ -107,10 +108,11 @@ exports.sendMessage = (req, res, next) => {
   })
     .then(() => {
       checkValidityPost(req.body.title, req.body.content);
+
       models.Message.create({
         UserId: userId,
-        title: req.body.title,
-        content: req.body.content,
+        title: req.body.title.trim(),
+        content: req.body.content.trim(),
         attachment: null,
         likes: 0,
       }) // revoir pour intégrer l'ajout d'une image
@@ -144,9 +146,9 @@ exports.updateMessage = (req, res, next) => {
 
       messageFound
         .update({
-          title: req.body.title ? req.body.title : messageFound.title,
-          content: req.body.content ? req.body.content : messageFound.content,
-          attachment: req.body.attachment ? req.body.attachment : messageFound.attachment,
+          title: req.body.title ? req.body.title.trim() : messageFound.title,
+          content: req.body.content ? req.body.content.trim() : messageFound.content,
+          attachment: req.body.attachment ? req.body.attachment.trim() : messageFound.attachment,
         })
         .then(() => {
           return res.status(201).json({ message: "Message modifié !" });
