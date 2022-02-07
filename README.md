@@ -20,6 +20,12 @@ Pour Mac via Homebrew : lancer `brew install postgresql`.
 Lancer le serveur : `pg_ctl -D /usr/local/var/postgres start`.
 Accéder à postgres : `psql postgres`.
 
+Créer les bases de données : `CREATE DATABASE database_development_groupo;`
+`CREATE DATABASE database_test_groupo;`
+`CREATE DATABASE database_production_groupo;`.
+
+Lancer la migration : `sequelize db:migrate`.
+
 ### Dans le dossier frontend "grouporama-app"
 
 Les dépendances suivantes sont requises pour faire tourner le frontend :
