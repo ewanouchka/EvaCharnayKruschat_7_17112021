@@ -8,7 +8,8 @@
     /></router-link>
     <a href="#Text-Editor"><button>Poster un message</button></a>
     <h1>Fil d'actualité</h1>
-    <section><Messages /></section>
+    <section id="Messages"><Messages /></section>
+    <h2>Poster un message</h2>
     <section id="Text-Editor"><TextEditor /></section>
   </div>
 </template>
@@ -24,21 +25,16 @@ export default {
     Messages,
     TextEditor,
   },
-  data: function () {
-    return {};
-  },
-  methods: {},
 };
 </script>
 
 
 
 <style scoped lang="scss">
-// revoir le css responsive
 .thread {
   display: flex;
   flex-wrap: wrap;
-  align-items: space-between;
+  align-items: center;
 }
 
 .thread__logo {
@@ -54,6 +50,14 @@ export default {
 }
 
 .thread section {
+  width: 100%;
+}
+
+#Messages {
+  min-height: 40vh;
+}
+
+.thread h2 {
   width: 100%;
 }
 
