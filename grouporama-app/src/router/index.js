@@ -4,8 +4,9 @@ import Home from "../views/Home.vue";
 import Signup from "../views/Signup.vue";
 import Profile from "../views/Profile.vue";
 import Thread from "../views/Thread.vue";
-import EditPost from "../views/EditPost.vue";
 import PostDetail from "../views/PostDetail.vue";
+import EditPost from "../views/EditPost.vue";
+import EditComm from "../views/EditComm.vue";
 import Error404 from "../views/Error404.vue";
 
 const checkAuth = () => {
@@ -28,7 +29,7 @@ const routes = [
     component: Signup,
   },
   {
-    path: "/profile/?id=:userId",
+    path: "/profile/:userId",
     name: "Profile",
     component: Profile,
     beforeEnter: (to, from, next) => {
@@ -49,7 +50,16 @@ const routes = [
     },
   },
   {
-    path: "/editpost/?messageId=:messageId",
+    path: "/messages/:messageId",
+    name: "PostDetail",
+    component: PostDetail,
+    beforeEnter: (to, from, next) => {
+      if (checkAuth()) next();
+      else next({ name: "Home" });
+    },
+  },
+  {
+    path: "/editpost/:messageId",
     name: "EditPost",
     component: EditPost,
     beforeEnter: (to, from, next) => {
@@ -58,9 +68,9 @@ const routes = [
     },
   },
   {
-    path: "/messages/:messageId",
-    name: "PostDetail",
-    component: PostDetail,
+    path: "/messages/:messageId/editcomm/:commentId",
+    name: "EditComm",
+    component: EditComm,
     beforeEnter: (to, from, next) => {
       if (checkAuth()) next();
       else next({ name: "Home" });
