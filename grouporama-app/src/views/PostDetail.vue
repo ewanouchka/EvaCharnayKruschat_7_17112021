@@ -33,13 +33,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-// revoir le css responsive
-.post-detail {
-  /*display: flex;
-  flex-wrap: wrap;
-  align-items: space-between;*/
-}
-
 .post-detail__logo {
   width: 40rem;
   height: 10rem;
