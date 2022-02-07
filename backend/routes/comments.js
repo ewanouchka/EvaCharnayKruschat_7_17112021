@@ -8,8 +8,8 @@ const auth = require("../middleware/auth");
 // on récupère les fonctions dans les controllers > users
 const commentCtrl = require("../controllers/comments");
 
-// on crée les routes -- A REVOIR
-router.get("/:messageId/comments/", auth, commentCtrl.getComments);
+// on crée les routes
+router.get("/:messageId/comments/:commentId", auth, commentCtrl.getOneComment);
 router.post("/:messageId/comments/", auth, commentCtrl.sendComment);
 router.put("/:messageId/comments/:commentId", auth, commentCtrl.updateComment);
 router.delete("/:messageId/comments/:commentId", auth, commentCtrl.deleteComment);
