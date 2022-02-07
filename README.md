@@ -26,9 +26,31 @@ Créer les bases de données :
 - `CREATE DATABASE database_test_groupo;`
 - `CREATE DATABASE database_production_groupo;`.
 
+### Dans le dossier backend
+
+Lancer la commande `npm install`.
+
+Les dépendances suivantes sont utilisées pour faire tourner le backend :
+
+- "bcrypt": "^5.0.1",
+- "body-parser": "^1.19.0",
+- "dotenv": "^10.0.0",
+- "express": "^4.17.1",
+- "jsonwebtoken": "^8.5.1",
+- "multer": "^1.4.3",
+- "pg": "^8.7.1",
+- "pg-hstore": "^2.3.4",
+- "sequelize": "^6.12.0-alpha.1"
+
+Il conviendra d'ajouter un fichier '.env' comportant les variables environnementales requises à la racine du dossier backend. (Ces éléments sont déjà présent dans le dossier .zip transmis pour l'évaluation).
+
 Lancer la migration : `sequelize db:migrate`.
 
+Lancez node server ou nodemon server. La console doit vous indiquer 'Listening on port 3000'. Utiliser Ctrl+C dans le terminal pour arrêter le serveur.
+
 ### Dans le dossier frontend "grouporama-app"
+
+Lancez la commande `npm install`.
 
 Les dépendances suivantes sont requises pour faire tourner le frontend :
 dependencies:
@@ -58,21 +80,3 @@ App running at:
 
 Ouvrir le navigateur à l'adresse indiquée.
 Utiliser Ctrl+C dans le terminal pour arrêter le serveur local.
-
-### Dans le dossier backend
-
-Les dépendances suivantes sont utilisées pour faire tourner le backend :
-
-- "bcrypt": "^5.0.1",
-- "body-parser": "^1.19.0",
-- "dotenv": "^10.0.0",
-- "express": "^4.17.1",
-- "jsonwebtoken": "^8.5.1",
-- "multer": "^1.4.3",
-- "pg": "^8.7.1",
-- "pg-hstore": "^2.3.4",
-- "sequelize": "^6.12.0-alpha.1"
-
-Il conviendra d'ajouter un fichier '.env' comportant les variables environnementales requises à la racine du dossier backend. (Ces éléments sont déjà présent dans le dossier .zip transmis pour l'évaluation).
-
-Lancez node server ou nodemon server. La console doit vous indiquer 'Listening on port 3000'. Utiliser Ctrl+C dans le terminal pour arrêter le serveur.
