@@ -30,8 +30,11 @@ Lancer la migration : `sequelize db:migrate`.
 
 Les dépendances suivantes sont requises pour faire tourner le frontend :
 dependencies:
+
 "core-js": "^3.6.5",
+
 "vue": "^2.6.11",
+
 "vue-router": "^3.2.0"
 
 devDependencies:
