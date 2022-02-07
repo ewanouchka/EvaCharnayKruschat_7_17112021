@@ -12,20 +12,15 @@
         </h3>
         <p>{{ message.content }}</p>
         <div class="post-options">
-          <router-link
-            title="répondre au message"
-            :to="{
-              name: `CommentEditor`,
-            }"
+          <a href="#bottom" title="répondre au message"
             ><i class="fas fa-reply post-options__icons"></i>
-          </router-link>
+          </a>
           <span v-if="showActions(message.UserId, isAdmin) === true">
             <router-link
               title="éditer le message"
               :to="{
                 name: 'EditPost',
                 params: { messageId: message.id },
-                children: CommentEditor,
               }"
             >
               <i class="fas fa-pencil-alt post-options__icons"></i>
@@ -54,7 +49,10 @@
           <span v-if="showActions(item.UserId, isAdmin) === true">
             <router-link
               title="éditer le commentaire"
-              :to="{ name: 'EditComm', params: { commentId: item.id } }"
+              :to="{
+                name: 'EditComm',
+                params: { messageId: message.id, commentId: item.id },
+              }"
             >
               <i class="fas fa-pencil-alt post-options__icons"></i>
             </router-link>
@@ -78,7 +76,6 @@
 </template>
 
 <script>
-// ajouter bouton page suivante pour offset suivant/précédent
 import Popup from "@/components/Popup.vue";
 
 export default {
@@ -93,7 +90,8 @@ export default {
       detail: "Aïe... le détail est vide",
       isLoggedIn: true,
       message: { User: { first_name: null, last_name: null } },
-      reqSent: false,
+      postDelete: false,
+      commDelete: false,
       isAdmin: false,
     };
   },
@@ -106,7 +104,10 @@ export default {
     },
     closePopup() {
       this.isPopupVisible = false;
-      if (this.reqSent) {
+      if (this.commDelete) {
+        this.$router.go();
+      }
+      if (this.postDelete) {
         this.$router.push({
           name: "Thread",
         });
@@ -138,16 +139,6 @@ export default {
           const postsJSON = await posts.json();
           this.isAdmin = postsJSON.isAdmin;
 
-          /*if (postsJSON.error) {
-            console.log("if postJSON.error");
-            console.log(this.showPopup());
-            this.isLoggedIn = false;
-            this.showPopup(
-              `Erreur : ${postsJSON.error}`,
-              "Votre session a peut-être expiré ? Essayez de vous reconnecter."
-            );
-          }*/
-
           if (postsJSON.message) {
             const postDate = new Date(postsJSON.message.createdAt);
             const postComments = postsJSON.message.Comments;
@@ -173,14 +164,6 @@ export default {
             this.message = postsJSON.message;
           }
         } catch (error) {
-          console.log("On arrive là (catch error) ?");
-          console.log(
-            this.showPopup(
-              "Impossible d'accéder au fil d'actualité.",
-              `${error}.`
-            )
-          );
-
           this.showPopup(
             "Impossible d'accéder au fil d'actualité.",
             `${error}.`
@@ -222,10 +205,40 @@ export default {
               `${deletionBackSent.error}`
             );
           } else {
-            // voir pour faire un popup de confirmation avant suppression
-            // revoir avec suppression des commentaires associés avant la suppression du message
-            this.reqSent = true;
+            this.postDelete = true;
             this.showPopup("Message supprimé !", "");
+          }
+        } catch (error) {
+          this.showPopup("Une erreur est survenue :", `${error}`);
+        }
+      })();
+    },
+    deleteComm(commentId) {
+      (async () => {
+        try {
+          const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
+          const messageId = this.$route.params.messageId;
+
+          const deletionSent = await fetch(
+            `http://localhost:3000/api/messages/${messageId}/comments/${commentId}`,
+            {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          );
+          const deletionBackSent = await deletionSent.json();
+
+          if (deletionBackSent.error) {
+            this.showPopup(
+              "Une erreur est survenue :",
+              `${deletionBackSent.error}`
+            );
+          } else {
+            this.commDelete = true;
+            this.showPopup("Commentaire supprimé !", "");
           }
         } catch (error) {
           this.showPopup("Une erreur est survenue :", `${error}`);
@@ -240,9 +253,58 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.posts-container,
+.comments-container {
+  padding: 0;
+}
 .posts-container h1 {
   margin: 0;
   align-self: center;
   flex: 1;
+}
+.post-bloc {
+  background: var(--color-primary-transparent);
+  border-radius: 0.5rem;
+  margin: 0 0 1rem 0;
+  padding: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+h2 {
+  margin: 0;
+  border-bottom: 1px solid var(--color-primary);
+  font-size: 1.25rem;
+  width: 100%;
+}
+h3 {
+  width: 100%;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: normal;
+  font-style: italic;
+}
+p {
+  width: 100%;
+  margin: 0.5rem;
+  padding: 0.25rem;
+  align-self: stretch;
+  background: var(--color-transparent);
+  border-radius: 0.5rem;
+  text-align: justify;
+}
+.post-options {
+  margin: 0 0 0.25rem 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.post-options__icons {
+  margin: 0 0.75rem 0 0;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    color: var(--color-secondary);
+  }
 }
 </style>
