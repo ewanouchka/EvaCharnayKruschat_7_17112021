@@ -11,7 +11,6 @@
         class="form-input"
         type="email"
         required
-        pattern="^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$"
       />
       <!-- oninput="checkValidity(this)" -->
 
@@ -23,7 +22,6 @@
         class="form-input"
         type="password"
         required
-        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
       />
 
       <button @click.prevent="loginSubmit" class="button" id="login-submit">
@@ -72,26 +70,38 @@ export default {
         this.$router.go();
       }
     },
-    checkTextValidity(text) {
+    checkTextValidity(text, pattern) {
       // on supprime les espaces au début et à la fin de la chaîne
       text = text.trim();
       // on bloque si des champs requis sont manquants
-      if (!text || text.length <= 3) {
+      if (!text || !pattern.test(text)) {
         return false;
       } else {
         return true;
       }
     },
     checkValidityLogin() {
+      // constantes pattern de validation
+      const emailRegex = new RegExp(
+        `^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$`
+      );
+      const passwordRegex = new RegExp(
+        `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\\d@$!%*?&()_+=-]{8,}$`
+      );
+
       if (
-        !this.checkTextValidity(this.email) ||
-        !this.checkTextValidity(this.password)
+        !this.checkTextValidity(this.email, emailRegex) ||
+        !this.checkTextValidity(this.password, passwordRegex)
       ) {
+        this.inputValidity = false;
         this.showPopup(
           "Les informations saisies ne sont pas valides.",
           `Assurez-vous que tous les champs sont correctement renseignés :\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).`
         );
-      } else this.inputValidity = true;
+        return;
+      } else {
+        this.inputValidity = true;
+      }
     },
     loginSubmit() {
       this.checkValidityLogin();

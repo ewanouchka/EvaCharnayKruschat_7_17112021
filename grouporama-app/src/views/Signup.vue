@@ -19,7 +19,6 @@
         class="form-input"
         type="text"
         required
-        pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
       />
 
       <label for="Surname" class="form-label">Votre prénom : </label>
@@ -30,7 +29,6 @@
         class="form-input"
         type="text"
         required
-        pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
       />
 
       <label for="Email" class="form-label">Votre e-mail : </label>
@@ -41,7 +39,6 @@
         class="form-input"
         type="email"
         required
-        pattern="^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$"
       />
 
       <!-- oninput="checkValidity(this)" -->
@@ -53,7 +50,6 @@
         class="form-input"
         type="password"
         required
-        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
       />
 
       <label for="Repeat-Password" class="form-label"
@@ -66,7 +62,6 @@
         class="form-input"
         type="password"
         required
-        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
       />
 
       <button @click.prevent="signupSubmit" class="button" id="signup-submit">
@@ -122,7 +117,7 @@ export default {
       // on supprime les espaces au début et à la fin de la chaîne
       text = text.trim();
       // on bloque si des champs requis sont manquants
-      if (!text || text.length <= 3 || !pattern.test(text)) {
+      if (!text || !pattern.test(text)) {
         return false;
       } else {
         return true;

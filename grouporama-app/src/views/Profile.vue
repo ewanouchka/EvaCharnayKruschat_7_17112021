@@ -7,7 +7,6 @@
         class="home__logo"
     /></router-link>
     <section>
-      <!-- revoir les for="Nom" / input name="Name" -->
       <div v-if="isEditVisible === true" id="profile-edit">
         <h1>Modifier votre profil</h1>
         <form id="profile-form">
@@ -15,66 +14,47 @@
           <input
             placeholder="Dupont"
             name="Name"
-            id="Name"
+            v-model="name"
             class="form-input"
             type="text"
-            pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
           />
-          <span class="error-visible" id="error-message-Name"></span>
 
-          <label for="Surname" class="form-label"
-            >Votre prénom :
-            <span class="error-visible" id="error-message-Surname"></span>
-          </label>
+          <label for="Surname" class="form-label">Votre prénom : </label>
           <input
             placeholder="Dominique"
             name="Surname"
-            id="Surname"
+            v-model="surname"
             class="form-input"
             type="text"
-            pattern="^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$"
           />
 
-          <label for="Email" class="form-label"
-            >Votre e-mail :
-            <span class="error-visible" id="error-message-Email"></span>
-          </label>
+          <label for="Email" class="form-label">Votre e-mail : </label>
           <input
             placeholder="contact@groupomania.com"
             name="Email"
-            id="Email"
+            v-model="email"
             class="form-input"
             type="email"
-            pattern="^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$"
           />
 
-          <label for="Password" class="form-label"
-            >Votre mot de passe :
-            <span class="error-visible" id="error-message-Password"></span>
-          </label>
+          <label for="Password" class="form-label">Votre mot de passe : </label>
           <input
             placeholder="123456AzErTy*"
             name="Password"
-            id="Password"
+            v-model="password"
             class="form-input"
             type="password"
-            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
           <label for="Repeat-Password" class="form-label"
             >Répétez votre mot de passe :
-            <span
-              class="error-visible"
-              id="error-message-Repeat-Password"
-            ></span>
           </label>
           <input
             placeholder="123456AzErTy*"
             name="Repeat-Password"
-            id="Repeat-Password"
+            v-model="repeatedPassword"
             class="form-input"
             type="password"
-            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
           <button @click.prevent="confirmEdit" class="button" id="edit-profile">
@@ -88,33 +68,26 @@
         <form id="profile-form">
           <label for="Password" class="form-label"
             >Saisissez votre mot de passe :
-            <span class="error-visible" id="error-message-Password"></span>
           </label>
           <input
             placeholder="123456AzErTy*"
             name="Password"
-            id="Password"
+            v-model="password"
             class="form-input"
             type="password"
             required
-            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
           <label for="Repeat-Password" class="form-label"
             >Répétez votre mot de passe :
-            <span
-              class="error-visible"
-              id="error-message-Repeat-Password"
-            ></span>
           </label>
           <input
             placeholder="123456AzErTy*"
             name="Repeat-Password"
-            id="Repeat-Password"
+            v-model="repeatedPassword"
             class="form-input"
             type="password"
             required
-            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\d@$!%*?&()_+=-]{8,}$"
           />
 
           <button
@@ -130,8 +103,8 @@
       <div v-else id="profile-content">
         <h1>Votre profil</h1>
         <div class="profile-card">
-          <h1>{{ userFirstName }} {{ userLastName }}</h1>
-          <p>{{ userEmail }}</p>
+          <h1>{{ surname }} {{ name }}</h1>
+          <p>{{ email }}</p>
         </div>
 
         <button @click.prevent="showEdit" class="button" id="show-edit">
@@ -153,11 +126,6 @@
 </template>
 
 <script>
-// mettre checkAllValidity en méthode et la rappeler seulement dans le if
-// ne plus utiliser de querySelector, mais les data
-// revoir le popup si aucune modification n'est apportée (peut-être dans checkValidity ?)
-// revoir css responsive sur les boutons + largeur bloc encadré
-// revoir pour les formulaires en général : affichage message d'erreur sur chaque ligne
 import Popup from "@/components/Popup.vue";
 
 export default {
@@ -165,19 +133,20 @@ export default {
   components: {
     Popup,
   },
-  props: ["userSurname", "userName", "email"],
   data: function () {
     return {
-      welcome: "Bienvenue",
-      userFirstName: this.userSurname,
-      userLastName: this.userName,
-      userEmail: this.email,
+      name: "",
+      surname: "",
+      email: "",
+      password: "",
+      repeatedPassword: "",
       isEditVisible: false,
       isSupprVisible: false,
       isPopupVisible: false,
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
       isLoggedIn: true,
+      isDeleted: false,
     };
   },
   methods: {
@@ -188,10 +157,12 @@ export default {
     },
     closePopup() {
       this.isPopupVisible = false;
-      if (!localStorage.getItem("userAuth")) {
+      if (this.isDeleted) {
         this.$router.push({
           name: "Home",
         });
+        localStorage.removeItem("userAuth");
+        this.$router.go();
       }
       if (this.isLoggedIn == false) {
         localStorage.removeItem("userAuth");
@@ -202,38 +173,111 @@ export default {
         this.getUserProfile();
       }
     },
+    checkTextValidity(text, pattern) {
+      // on supprime les espaces au début et à la fin de la chaîne
+      text = text.trim();
+      // on bloque si des champs requis sont manquants
+      if (text && !pattern.test(text)) {
+        console.log("checktest false");
+        return false;
+      } else {
+        console.log("checktest true");
+        return true;
+      }
+    },
+    checkValidityEdit() {
+      // constantes pattern de validation
+      const nameRegex = new RegExp(
+        `^[àáâãäåçèéêëìíîïðòóôõöùúûüýÿa-zA-Z '-]{2,}$`
+      );
+      const emailRegex = new RegExp(
+        `^[a-zA-Z0-9]+[a-zA-Z._-]*@{1}[a-zA-Z0-9]+[.]{1}[a-zA-Z]{2,}$`
+      );
+      const passwordRegex = new RegExp(
+        `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\\d@$!%*?&()_+=-]{8,}$`
+      );
+
+      if (
+        !this.name &&
+        !this.surname &&
+        !this.email &&
+        !this.password &&
+        !this.repeatedPassword
+      ) {
+        this.inputValidity = false;
+        this.showPopup("Aucune modification apportée.", "");
+        return;
+      }
+      if (
+        !this.checkTextValidity(this.name, nameRegex) ||
+        !this.checkTextValidity(this.surname, nameRegex) ||
+        !this.checkTextValidity(this.email, emailRegex) ||
+        !this.checkTextValidity(this.password, passwordRegex) ||
+        !this.checkTextValidity(this.repeatedPassword, passwordRegex)
+      ) {
+        this.inputValidity = false;
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "Assurez-vous que tous les champs sont correctement renseignés :\n- Le nom et le prénom doivent comporter au moins deux caractères alphabétiques, sans caractère numérique.\n- L'email doit être valide.\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-)."
+        );
+        return;
+      }
+      if (this.password !== this.repeatedPassword) {
+        this.inputValidity = false;
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "Le mot de passe ressaisi doit être identique au premier."
+        );
+      } else {
+        this.inputValidity = true;
+      }
+    },
+    checkValiditySuppr() {
+      // constantes pattern de validation
+      const passwordRegex = new RegExp(
+        `^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&()_+=-])[A-Za-z\\d@$!%*?&()_+=-]{8,}$`
+      );
+
+      if (!this.password || !this.repeatedPassword) {
+        this.inputValidity = false;
+        this.showPopup("Veuillez renseigner tous les champs.", "");
+        return;
+      }
+      if (
+        !this.checkTextValidity(this.password, passwordRegex) ||
+        !this.checkTextValidity(this.repeatedPassword, passwordRegex)
+      ) {
+        this.inputValidity = false;
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-)."
+        );
+        return;
+      }
+      if (this.password !== this.repeatedPassword) {
+        this.inputValidity = false;
+        this.showPopup(
+          "Les informations saisies ne sont pas valides.",
+          "Le mot de passe ressaisi doit être identique au premier."
+        );
+        return;
+      } else {
+        this.inputValidity = true;
+      }
+    },
     showEdit() {
       this.isEditVisible = true;
     },
     confirmEdit() {
-      const inputValues = document.querySelectorAll(".form-input");
-      const getInputValue = (inputId) => {
-        const inputValue = document.querySelector(`#${inputId}`).value;
-        return inputValue;
-      };
+      this.checkValidityEdit();
 
-      const checkAllValidity = () => {
-        let validity = true;
-        if (getInputValue("Password") !== getInputValue("Repeat-Password")) {
-          validity = false;
-        }
-        for (const inputValue of inputValues) {
-          if (inputValue.validity.valid == false) {
-            validity = false;
-            inputValue.classList.add("input-invalid");
-          }
-        }
-        return validity;
-      };
-      checkAllValidity();
-
-      if (checkAllValidity()) {
+      if (this.inputValidity) {
         (async () => {
           try {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const userId = new URL(location.href).searchParams.get("id");
+            const userId = this.$route.params.userId;
 
             const updateSent = await fetch(
               `http://localhost:3000/api/profiles/${userId}`,
@@ -241,10 +285,10 @@ export default {
                 method: "PUT",
                 body: JSON.stringify({
                   userId: `${userId}`,
-                  first_name: getInputValue("Surname"),
-                  last_name: getInputValue("Name"),
-                  email: getInputValue("Email"),
-                  password: getInputValue("Password"),
+                  first_name: this.surname,
+                  last_name: this.name,
+                  email: this.email,
+                  password: this.password,
                 }),
                 headers: {
                   "Content-Type": "application/json",
@@ -267,46 +311,21 @@ export default {
           }
         })();
         this.isEditVisible = false;
-      } else {
-        this.showPopup(
-          "Les informations saisies ne sont pas valides.",
-          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe répété doit être identique au premier.`
-        );
       }
     },
     showSuppr() {
       this.isSupprVisible = true;
     },
     confirmSuppr() {
-      // mettre checkAllValidity en méthode et la rappeler seulement dans le if
-      const inputValues = document.querySelectorAll(".form-input");
-      const getInputValue = (inputId) => {
-        const inputValue = document.querySelector(`#${inputId}`).value;
-        return inputValue;
-      };
+      this.checkValiditySuppr();
 
-      const checkAllValidity = () => {
-        let validity = true;
-        if (getInputValue("Password") !== getInputValue("Repeat-Password")) {
-          validity = false;
-        }
-        for (const inputValue of inputValues) {
-          if (inputValue.validity.valid == false) {
-            validity = false;
-            inputValue.classList.add("input-invalid");
-          }
-        }
-        return validity;
-      };
-      checkAllValidity();
-
-      if (checkAllValidity()) {
+      if (this.inputValidity) {
         (async () => {
           try {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const userId = new URL(location.href).searchParams.get("id");
+            const userId = this.$route.params.userId;
 
             const deletionSent = await fetch(
               `http://localhost:3000/api/profiles/${userId}`,
@@ -314,7 +333,7 @@ export default {
                 method: "DELETE",
                 body: JSON.stringify({
                   userId: `${userId}`,
-                  password: getInputValue("Password"),
+                  password: this.password,
                 }),
                 headers: {
                   "Content-Type": "application/json",
@@ -330,7 +349,7 @@ export default {
                 `${deletionBackSent.error}`
               );
             } else {
-              localStorage.removeItem("userAuth");
+              this.isDeleted = true;
               this.showPopup("Utilisateur supprimé !", "");
             }
           } catch (error) {
@@ -338,16 +357,11 @@ export default {
           }
         })();
         this.isSupprVisible = false;
-      } else {
-        this.showPopup(
-          "Les informations saisies ne sont pas valides.",
-          `Assurez-vous que tous les champs sont correctement renseignés :\n- Le mot de passe doit contenir au moins huit caractères dont une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&()_+=-).\n- Le mot de passe répété doit être identique au premier.`
-        );
       }
     },
     getUserProfile() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
-      const userId = new URL(location.href).searchParams.get("id");
+      const userId = this.$route.params.userId;
 
       (async () => {
         try {
@@ -373,9 +387,9 @@ export default {
           }
 
           if (userProfileJSON) {
-            this.userFirstName = userProfileJSON.first_name;
-            this.userLastName = userProfileJSON.last_name;
-            this.userEmail = userProfileJSON.email;
+            this.surname = userProfileJSON.first_name;
+            this.name = userProfileJSON.last_name;
+            this.email = userProfileJSON.email;
           }
         } catch (error) {
           this.showPopup(

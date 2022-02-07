@@ -2,27 +2,19 @@
   <div id="text-editor">
     <form class="text-editor">
       <div>
-        <label for="Title"
-          >Titre du post :
-          <span class="error-visible" id="error-message-Title"></span>
-        </label>
+        <label for="Title">Titre du post : </label>
         <input
           placeholder="Titre du post"
           name="Title"
-          id="Title"
           type="text"
           class="post-input"
           v-model="postTitle"
           required
         />
-        <label for="Post"
-          >Votre post :
-          <span class="error-visible" id="error-message-Post"></span>
-        </label>
+        <label for="Post">Votre post : </label>
         <textarea
           placeholder="Votre post"
           name="Content"
-          id="Content"
           rows="5"
           class="post-input"
           v-model="postContent"
@@ -69,6 +61,7 @@ export default {
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
       postSent: false,
+      postEdited: false,
       contextPost: "Rien",
       postTitle: "",
       postContent: "",
@@ -77,13 +70,12 @@ export default {
   },
   methods: {
     checkContext() {
-      const pathName = window.location.pathname;
-      if (pathName === "/thread") {
+      if (this.$route.path === "/thread") {
         this.contextPost = "postSubmit";
         this.postTitle = "";
         this.postContent = "";
       }
-      if (pathName === "/editpost/") {
+      if (this.$route.path.includes("/editpost/")) {
         this.contextPost = "postEdit";
         this.getOriginalText();
       }
@@ -96,15 +88,19 @@ export default {
     closePopup() {
       this.isPopupVisible = false;
       if (this.postSent) {
+        this.$router.go();
+      }
+      if (this.postEdited) {
+        const messageId = this.$route.params.messageId;
         this.$router.push({
           name: "PostDetail",
-          params: { messageId: `${this.messageId}` },
+          params: { messageId: `${messageId}` },
         });
       }
     },
     getOriginalText() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
-      const messageId = new URL(location.href).searchParams.get("messageId");
+      const messageId = this.$route.params.messageId;
       (async () => {
         try {
           const oneMessage = await fetch(
@@ -120,8 +116,8 @@ export default {
 
           const oneMessageBack = await oneMessage.json();
 
-          this.postTitle = oneMessageBack.title;
-          this.postContent = oneMessageBack.content;
+          this.postTitle = oneMessageBack.message.title;
+          this.postContent = oneMessageBack.message.content;
         } catch (error) {
           this.showPopup("Impossible d'accéder au message.", `${error}.`);
         }
@@ -200,10 +196,7 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const messageId = new URL(location.href).searchParams.get(
-              "messageId"
-            );
-            this.messageId = messageId;
+            const messageId = this.$route.params.messageId;
 
             await fetch(`http://localhost:3000/api/messages/${messageId}`, {
               method: "PUT",
@@ -218,7 +211,7 @@ export default {
               },
             });
 
-            this.postSent = true;
+            this.postEdited = true;
 
             this.showPopup("Votre modification est enregistrée", ``);
           } catch (error) {
