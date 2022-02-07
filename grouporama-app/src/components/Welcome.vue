@@ -10,7 +10,6 @@
 
       <ul v-else class="actu-container">
         <li class="actu-bloc" v-for="item in messages" :key="item.id">
-          Voir 2
           <h2>{{ item.title }}</h2>
           <h3>
             par <span v-html="item.User.first_name"></span>&nbsp;<span
