@@ -15,6 +15,8 @@ module.exports = {
           model: "Users",
           key: "id",
         },
+        onDelete: "CASCADE",
+        hooks: true,
       },
       MessageId: {
         allowNull: false,
@@ -23,6 +25,8 @@ module.exports = {
           model: "Messages",
           key: "id",
         },
+        onDelete: "CASCADE",
+        hooks: true,
       },
       content: {
         allowNull: false,
