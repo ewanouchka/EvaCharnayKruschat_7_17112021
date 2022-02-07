@@ -1,6 +1,9 @@
 <template>
   <div id="posts">
-    <ul class="posts-container">
+    <ul v-if="messages === ''" class="posts-container">
+      <li>Aucune participation n'a été postée pour le moment.</li>
+    </ul>
+    <ul v-else class="posts-container">
       <li v-for="item in messages" :key="item.id" class="post-bloc">
         <h2>{{ item.title }}</h2>
         <h3>
@@ -66,7 +69,6 @@ export default {
   },
   methods: {
     showPopup(newMessage, newDetail) {
-      console.log("showpopup");
       this.isPopupVisible = true;
       this.msg = newMessage;
       this.detail = newDetail;
@@ -74,9 +76,7 @@ export default {
     closePopup() {
       this.isPopupVisible = false;
       if (this.reqSent) {
-        this.$router.push({
-          name: "Thread",
-        });
+        this.$router.go();
       }
       if (this.isLoggedIn == false) {
         localStorage.removeItem("userAuth");
@@ -98,21 +98,9 @@ export default {
           });
 
           const postsJSON = await posts.json();
-          console.log(postsJSON);
           this.isAdmin = postsJSON.isAdmin;
-          console.log(this.isAdmin);
 
-          /*if (postsJSON.error) {
-            console.log("if postJSON.error");
-            console.log(this.showPopup());
-            this.isLoggedIn = false;
-            this.showPopup(
-              `Erreur : ${postsJSON.error}`,
-              "Votre session a peut-être expiré ? Essayez de vous reconnecter."
-            );
-          }*/
-
-          if (postsJSON.messages) {
+          if (postsJSON.messages.length > 0) {
             for (const message of postsJSON.messages) {
               const postDate = new Date(message.createdAt);
               const dateOptions = {
@@ -130,14 +118,6 @@ export default {
             this.messages = postsJSON.messages;
           }
         } catch (error) {
-          console.log("On arrive là (catch error) ?");
-          console.log(
-            this.showPopup(
-              "Impossible d'accéder au fil d'actualité.",
-              `${error}.`
-            )
-          );
-
           this.showPopup(
             "Impossible d'accéder au fil d'actualité.",
             `${error}.`
@@ -147,7 +127,6 @@ export default {
     },
     showActions(postUserId, isAdmin) {
       const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
-      //this.userId = userId;
       if (isAdmin === true) {
         return true;
       }
@@ -179,8 +158,6 @@ export default {
               `${deletionBackSent.error}`
             );
           } else {
-            // voir pour faire un popup de confirmation avant suppression
-            // revoir avec suppression des commentaires associés avant la suppression du message
             this.reqSent = true;
             this.showPopup("Message supprimé !", "");
           }
