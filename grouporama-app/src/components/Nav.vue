@@ -48,15 +48,16 @@ export default {
     checkAuth() {
       try {
         const verify = JSON.parse(localStorage.getItem("userAuth"));
-        const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
 
         if (!verify || verify.token == undefined || verify.token == "") {
-          return (this.isLoggedIn = false);
+          this.isLoggedIn = false;
         } else {
-          return (this.isLoggedIn = true), (this.userId = userId);
+          const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
+          this.isLoggedIn = true;
+          this.userId = userId;
         }
       } catch (error) {
-        console.log(error);
+        this.showPopup("Une erreur est survenue :", `${error}`);
       }
     },
     showPopup(newMessage, newDetail) {
@@ -66,7 +67,13 @@ export default {
     },
     closePopup() {
       this.isPopupVisible = false;
-      window.location.replace("/");
+      if (this.$route.path === "/") {
+        this.$router.go();
+      } else {
+        this.$router.push({
+          name: "Home",
+        });
+      }
     },
     logOut() {
       localStorage.removeItem("userAuth");
@@ -85,7 +92,7 @@ export default {
   width: 100%;
   background: var(--color-primary);
   height: var(--header-size);
-  padding: var(--padding-top-bottom);
+  padding: var(--padding-top-bottom) 0;
   color: var(--color-light);
   display: flex;
   flex-wrap: nowrap;
