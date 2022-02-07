@@ -40,7 +40,7 @@ exports.getMessages = (req, res, next) => {
   models.Message.findAll({
     where: { UserId: userId ? userId : { [Op.not]: null } },
     order: [["createdAt", "DESC"]],
-    limit: Number.isFinite(userId) ? 3 : null, // on pourra ajouter une limite pour fonction de pagination à l'avenir
+    limit: Number.isFinite(userId) ? 3 : null, // on limite à 3 sur la page d'accueil, on pourra ajouter une limite pour fonction de pagination à l'avenir
     offset: !isNaN(offset) ? offset : 0, // on pourra ajouter une fonction de pagination à l'avenir
     include: [
       {
@@ -113,9 +113,7 @@ exports.sendMessage = (req, res, next) => {
         UserId: userId,
         title: req.body.title.trim(),
         content: req.body.content.trim(),
-        attachment: null,
-        likes: 0,
-      }) // revoir pour intégrer l'ajout d'une image
+      })
         .then(() => {
           return res.status(201).json({ message: "Message enregistré !" });
         })
@@ -148,7 +146,6 @@ exports.updateMessage = (req, res, next) => {
         .update({
           title: req.body.title ? req.body.title.trim() : messageFound.title,
           content: req.body.content ? req.body.content.trim() : messageFound.content,
-          attachment: req.body.attachment ? req.body.attachment.trim() : messageFound.attachment,
         })
         .then(() => {
           return res.status(201).json({ message: "Message modifié !" });

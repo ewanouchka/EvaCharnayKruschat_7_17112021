@@ -34,9 +34,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // pour transformer le corps de la requête en objet maintenable
 app.use(bodyParser.json());
 
-// pour la gestion de l'enregistrement des images
-app.use("/images", express.static(path.join(__dirname, "images")));
-
 // pour l'utilisation des routes
 app.use("/api/auth", userRoutes); // revoir convention de nommage
 app.use("/api/profiles", profileRoutes); // revoir convention de nommage
