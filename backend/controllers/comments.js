@@ -17,27 +17,25 @@ const checkTextValidity = (text) => {
   }
 };
 
-// fonction accès aux posts
-exports.getComments = (req, res, next) => {
+exports.getOneComment = (req, res, next) => {
   // constantes
   const isAdmin = res.locals.isAdmin;
 
-  models.Comment.findAll({
-    order: [["createdAt", "ASC"]],
-    where: { MessageId: req.params.messageId },
+  models.Comment.findOne({
+    where: { id: req.params.commentId },
     include: [
       {
-        model: models.User,
-        attributes: ["first_name", "last_name"],
+        model: models.Message,
+        attributes: ["id"],
       },
     ],
   })
-    .then((comments) => {
-      if (comments) {
-        // on retourne les commentaires, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
-        return res.status(200).json({ commentaires: comments, isAdmin: isAdmin });
+    .then((comment) => {
+      if (comment) {
+        // on retourne les messages, et l'info admin du User pour l'affichage des fonctionnalités put et delete dans le front
+        return res.status(200).json({ commentaire: comment, isAdmin: isAdmin });
       } else {
-        return res.status(404).json({ error: "Aucun commentaire trouvé." });
+        return res.status(404).json({ error: "Le message n'a pas été trouvé." });
       }
     })
     .catch(() => {
