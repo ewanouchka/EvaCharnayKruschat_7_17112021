@@ -9,35 +9,30 @@
     <h1>Editer un message</h1>
 
     <section id="Text-Editor"><TextEditor /></section>
-    <section id="Review"><Review /></section>
+    <router-link to="/thread" class="bottom-link"
+      >Retour au fil d'actualité</router-link
+    >
   </div>
 </template>
 
 <script>
-import Review from "@/components/Review.vue";
 import TextEditor from "@/components/TextEditor.vue";
 
 export default {
   name: "EditPost",
   components: {
-    Review,
     TextEditor,
   },
   data: function () {
-    return {};
+    return {
+      message: "",
+    };
   },
   methods: {},
 };
 </script>
 
 <style scoped lang="scss">
-// revoir le css responsive
-.editpost {
-  /*display: flex;
-  flex-wrap: wrap;
-  align-items: space-between;*/
-}
-
 .editpost__logo {
   width: 40rem;
   height: 10rem;
@@ -50,7 +45,8 @@ export default {
   flex: 1;
 }
 
-.editpost section {
+.editpost section,
+.bottom-link {
   width: 100%;
 }
 
