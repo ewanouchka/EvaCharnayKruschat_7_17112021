@@ -3,7 +3,7 @@
     <form class="text-editor">
       <div>
         <label for="Content"
-          >Votre commentaire : {{ commContent }}
+          >Votre commentaire :
           <span class="error-visible" id="error-message-Post"></span>
         </label>
         <textarea
@@ -16,7 +16,6 @@
           required
         />
       </div>
-      Contexte ??? : {{ contextPost }}
       <button
         v-if="contextPost === 'commSubmit'"
         @click.prevent="commSubmit"
@@ -56,7 +55,8 @@ export default {
       isPopupVisible: false,
       msg: "Aïe... le message est vide",
       detail: "Aïe... le détail est vide",
-      postSent: false,
+      commSent: false,
+      commEdited: false,
       contextPost: "Contexte",
       commContent: "",
       inputValidity: false,
@@ -67,10 +67,7 @@ export default {
     checkContext() {
       const messageId = this.$route.params.messageId;
       const commentId = this.$route.params.commentId;
-      console.log(messageId);
-      console.log(commentId);
 
-      // this.messageId = messageId;
       if (messageId) {
         this.contextPost = "commSubmit";
         this.commContent = "";
@@ -87,21 +84,25 @@ export default {
     },
     closePopup() {
       this.isPopupVisible = false;
-      if (this.postSent) {
+      if (this.commEdited) {
         const messageId = this.$route.params.messageId;
         this.$router.push({
           name: "PostDetail",
           params: { messageId },
         });
       }
+      if (this.commSent) {
+        this.$router.go();
+      }
     },
     getOriginalComment() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
-      const commentId = new URL(location.href).searchParams.get("commentId");
+      const commentId = this.$route.params.commentId;
+      const messageId = this.$route.params.messageId;
       (async () => {
         try {
           const oneComment = await fetch(
-            `http://localhost:3000/api/comments/${commentId}`,
+            `http://localhost:3000/api/messages/${messageId}/comments/${commentId}`,
             {
               method: "GET",
               headers: {
@@ -113,7 +114,7 @@ export default {
 
           const oneCommentBack = await oneComment.json();
 
-          this.commContent = oneCommentBack.content;
+          this.commContent = oneCommentBack.commentaire.content;
         } catch (error) {
           this.showPopup("Impossible d'accéder au commentaire.", `${error}.`);
         }
@@ -141,8 +142,8 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-
             const messageId = this.$route.params.messageId;
+
             await fetch(
               `http://localhost:3000/api/messages/${messageId}/comments`,
               {
@@ -158,7 +159,7 @@ export default {
               }
             );
 
-            this.postSent = true;
+            this.commSent = true;
 
             this.showPopup("Votre commentaire est enregistré", ``);
           } catch (error) {
@@ -173,23 +174,19 @@ export default {
       if (this.inputValidity) {
         (async () => {
           try {
-            /*const userId = JSON.parse(localStorage.getItem("userAuth")).userId;
-            this.userId = userId;*/
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
-            const messageId = new URL(location.href).searchParams.get(
-              "messageId"
-            );
-            this.messageId = messageId;
+            const messageId = this.$route.params.messageId;
+            const commentId = this.$route.params.commentId;
 
-            const editMessage = await fetch(
-              `http://localhost:3000/api/messages/${messageId}`,
+            await fetch(
+              `http://localhost:3000/api/messages/${messageId}/comments/${commentId}`,
               {
                 method: "PUT",
                 body: JSON.stringify({
-                  messageId: this.messageId,
-                  content: this.postContent,
+                  commentId: `${commentId}`,
+                  content: this.commContent,
                 }),
                 headers: {
                   "Content-Type": "application/json",
@@ -198,9 +195,7 @@ export default {
               }
             );
 
-            console.log(editMessage.body);
-
-            this.postSent = true;
+            this.commEdited = true;
 
             this.showPopup("Votre modification est enregistrée", ``);
           } catch (error) {
