@@ -52,7 +52,7 @@
 import Popup from "@/components/Popup.vue";
 
 export default {
-  name: "Posts",
+  name: "Messages",
   components: {
     Popup,
   },
