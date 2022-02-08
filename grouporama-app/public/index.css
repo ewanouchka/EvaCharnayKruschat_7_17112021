@@ -3,10 +3,7 @@ body {
 }
 
 :root {
-  --color-primary: rgb(28, 28, 87);
-  --color-primary-transparent: rgba(28, 40, 155, 0.15);
   --color-secondary: rgb(247, 128, 128);
-  --color-secondary-transparent: rgb(252, 230, 230);
   --color-secondary-dark: rgb(226, 46, 46);
   --color-secondary-gradient: linear-gradient(
     -165deg,
@@ -15,18 +12,10 @@ body {
     var(--color-secondary-dark) 60%,
     var(--color-secondary-dark)
   );
-  --color-transparent: rgba(255, 255, 255, 0.95);
   --color-lighter: rgb(255, 255, 255);
-  --color-light: rgb(199, 199, 199);
-  --color-medium: rgb(128, 128, 128);
   --color-dark: rgb(56, 56, 56);
-  --color-darker: rgb(0, 0, 0);
   --font-text: Avenir, Helvetica, Arial, sans-serif;
-  --font-title: Avenir, Helvetica, Arial, sans-serif;
   --font-size: 16px;
-  --padding-top-bottom: 1rem;
-  --footer-size: 1.25rem;
-  --header-size: 2rem;
 }
 
 #app {
