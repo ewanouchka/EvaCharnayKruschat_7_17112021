@@ -6,7 +6,7 @@
         src="../assets/icon-left-font.svg"
         class="thread__logo"
     /></router-link>
-    <a href="#Text-Editor"><button>Poster un message</button></a>
+    <a class="button-link" href="#Text-Editor">Poster un message</a>
     <h1>Fil d'actualité</h1>
     <section id="Messages"><Messages /></section>
     <h2>Poster un message</h2>

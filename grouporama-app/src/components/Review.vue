@@ -34,8 +34,8 @@
         </div>
       </li>
     </ul>
+    <h2>Commentaires</h2>
     <ul class="comments-container">
-      <h2>Commentaires</h2>
       <li v-for="item in message.Comments" :key="item.id">
         <div class="post-options">
           <span v-if="showActions(item.UserId, isAdmin) === true">
@@ -253,8 +253,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.posts-container,
-.comments-container {
+.posts-container {
   padding: 0;
 }
 .posts-container h1 {
@@ -306,6 +305,11 @@ h2 {
   &:hover {
     color: var(--color-secondary);
   }
+}
+
+.comments-container {
+  padding: 0;
+  margin: 0;
 }
 
 .comments-container h3 {

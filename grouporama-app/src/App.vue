@@ -125,7 +125,8 @@ a {
   }
 }
 
-button {
+button,
+.button-link {
   margin: 1rem;
   border: none;
   border-radius: 2rem;
@@ -141,6 +142,10 @@ button {
     color: var(--color-light);
     box-shadow: 0 0 0.5rem var(--color-medium);
   }
+}
+
+.button-link {
+  line-height: 2rem;
 }
 
 .main-section {
