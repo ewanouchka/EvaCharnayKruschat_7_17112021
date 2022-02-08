@@ -37,14 +37,6 @@
     <ul class="comments-container">
       <h2>Commentaires</h2>
       <li v-for="item in message.Comments" :key="item.id">
-        <h3>
-          par <span v-html="item.User.first_name"></span>&nbsp;<span
-            v-html="item.User.last_name"
-          ></span
-          >, le
-          <span v-html="item.createdAt"></span>
-        </h3>
-        <p>{{ item.content }}</p>
         <div class="post-options">
           <span v-if="showActions(item.UserId, isAdmin) === true">
             <router-link
@@ -63,6 +55,14 @@
             ></i>
           </span>
         </div>
+        <h3>
+          par <span v-html="item.User.first_name"></span>&nbsp;<span
+            v-html="item.User.last_name"
+          ></span
+          >, le
+          <span v-html="item.createdAt"></span>
+        </h3>
+        <p>{{ item.content }}</p>
       </li>
     </ul>
 
@@ -79,7 +79,7 @@
 import Popup from "@/components/Popup.vue";
 
 export default {
-  name: "Posts",
+  name: "Review",
   components: {
     Popup,
   },
@@ -122,7 +122,7 @@ export default {
     getMessage() {
       const userToken = JSON.parse(localStorage.getItem("userAuth")).token;
       const messageId = this.$route.params.messageId;
-      console.log(messageId);
+
       (async () => {
         try {
           const posts = await fetch(
@@ -277,14 +277,14 @@ h2 {
   font-size: 1.25rem;
   width: 100%;
 }
-h3 {
+.post-bloc h3 {
   width: 100%;
   margin: 0;
   font-size: 1rem;
   font-weight: normal;
   font-style: italic;
 }
-p {
+.post-bloc p {
   width: 100%;
   margin: 0.5rem;
   padding: 0.25rem;
@@ -293,7 +293,7 @@ p {
   border-radius: 0.5rem;
   text-align: justify;
 }
-.post-options {
+.post-bloc .post-options {
   margin: 0 0 0.25rem 1rem;
   width: 100%;
   display: flex;
@@ -306,5 +306,36 @@ p {
   &:hover {
     color: var(--color-secondary);
   }
+}
+
+.comments-container h3 {
+  width: calc(100% - 60px);
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: normal;
+  font-style: italic;
+  text-align: left;
+  padding: 0.25rem;
+}
+.comments-container li {
+  background: var(--color-light);
+  position: relative;
+  padding: 0 0 1rem 0.25rem;
+  font-size: 0.9rem;
+}
+.comments-container p {
+  width: 100%;
+  margin: 0;
+  padding: 0.25rem;
+  align-self: stretch;
+  text-align: justify;
+}
+.comments-container .post-options {
+  margin: 0.25rem -0.35rem 0 0;
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 </style>
