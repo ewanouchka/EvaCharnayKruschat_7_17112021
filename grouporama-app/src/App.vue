@@ -30,6 +30,49 @@ export default {
 </script>
 
 <style lang="scss">
+body {
+  margin: 0;
+}
+
+:root {
+  --color-primary: rgb(28, 28, 87);
+  --color-primary-transparent: rgba(28, 40, 155, 0.15);
+  --color-secondary: rgb(247, 128, 128);
+  --color-secondary-transparent: rgb(252, 230, 230);
+  --color-secondary-dark: rgb(226, 46, 46);
+  --color-secondary-gradient: linear-gradient(
+    -165deg,
+    var(--color-lighter),
+    var(--color-secondary) 25%,
+    var(--color-secondary-dark) 60%,
+    var(--color-secondary-dark)
+  );
+  --color-transparent: rgba(255, 255, 255, 0.95);
+  --color-lighter: rgb(255, 255, 255);
+  --color-light: rgb(240, 240, 240);
+  --color-medium: rgb(170, 170, 170);
+  --color-dark: rgb(56, 56, 56);
+  --color-darker: rgb(0, 0, 0);
+  --font-text: Avenir, Helvetica, Arial, sans-serif;
+  --font-title: Avenir, Helvetica, Arial, sans-serif;
+  --font-size: 16px;
+  --padding-top-bottom: 1rem;
+  --footer-size: 1.25rem;
+  --header-size: 2rem;
+}
+
+#app {
+  font-family: var(--font-text);
+  font-size: var(--font-size);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: var(--color-dark);
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  height: 100vh;
+}
 a {
   text-decoration: none;
   color: var(--color-primary);
@@ -119,7 +162,7 @@ button {
 .form-input {
   width: 100%;
   margin: 0 1rem;
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-medium);
   border-radius: 3px;
   text-align: center;
   font-family: var(--font-text);
@@ -130,7 +173,7 @@ button {
   }
 }
 
-.input-invalid {
+.form-input-invalid {
   background: var(--color-secondary-transparent);
   border: 1px solid var(--color-secondary);
 }
