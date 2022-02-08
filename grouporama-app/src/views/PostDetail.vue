@@ -20,7 +20,7 @@ import Review from "@/components/Review.vue";
 import CommentEditor from "@/components/CommentEditor.vue";
 
 export default {
-  name: "EditPost",
+  name: "PostDetail",
   components: {
     Review,
     CommentEditor,
