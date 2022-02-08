@@ -181,7 +181,7 @@ export default {
   margin: 0;
   border-bottom: 1px solid var(--color-primary);
   font-size: 1.25rem;
-  width: 80%;
+  width: 100%;
 }
 .actu-bloc h3 {
   margin: 0;
