@@ -23,12 +23,6 @@ export default {
   components: {
     CommentEditor,
   },
-  data: function () {
-    return {
-      message: "",
-    };
-  },
-  methods: {},
 };
 </script>
 
