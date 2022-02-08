@@ -23,12 +23,6 @@ export default {
   components: {
     TextEditor,
   },
-  data: function () {
-    return {
-      message: "",
-    };
-  },
-  methods: {},
 };
 </script>
 
