@@ -2,14 +2,13 @@
   <div id="text-editor">
     <form class="text-editor">
       <div>
-        <label for="Content"
+        <label for="content"
           >Votre commentaire :
           <span class="error-visible" id="error-message-Post"></span>
         </label>
         <textarea
           placeholder="Votre post"
-          name="Content"
-          id="Content"
+          id="content"
           rows="5"
           class="post-input"
           v-model="commContent"
@@ -239,18 +238,8 @@ export default {
   text-align: left;
   padding: 0 0 0 1.25rem;
 }
-.text-editor input {
-  border: 1px solid var(--color-light);
-  margin: 0.5rem;
-  padding: 0.25rem;
-  align-self: stretch;
-  background: var(--color-transparent);
-  border-radius: 0.5rem;
-  text-align: justify;
-  font-family: var(--font-text);
-}
 .text-editor textarea {
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-medium);
   margin: 0.5rem;
   padding: 0.25rem;
   align-self: stretch;

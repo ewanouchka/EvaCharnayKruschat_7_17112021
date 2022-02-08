@@ -2,19 +2,19 @@
   <div id="text-editor">
     <form class="text-editor">
       <div>
-        <label for="Title">Titre du post : </label>
+        <label for="title">Titre du post : </label>
         <input
           placeholder="Titre du post"
-          name="Title"
+          id="title"
           type="text"
           class="post-input"
           v-model="postTitle"
           required
         />
-        <label for="Post">Votre post : </label>
+        <label for="content">Votre post : </label>
         <textarea
           placeholder="Votre post"
-          name="Content"
+          id="content"
           rows="5"
           class="post-input"
           v-model="postContent"
@@ -255,18 +255,9 @@ export default {
   text-align: left;
   padding: 0 0 0 1.25rem;
 }
-.text-editor input {
-  border: 1px solid var(--color-light);
-  margin: 0.5rem;
-  padding: 0.25rem;
-  align-self: stretch;
-  background: var(--color-transparent);
-  border-radius: 0.5rem;
-  text-align: justify;
-  font-family: var(--font-text);
-}
+.text-editor input,
 .text-editor textarea {
-  border: 1px solid var(--color-light);
+  border: 1px solid var(--color-medium);
   margin: 0.5rem;
   padding: 0.25rem;
   align-self: stretch;

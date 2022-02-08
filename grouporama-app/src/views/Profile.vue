@@ -10,48 +10,45 @@
       <div v-if="isEditVisible === true" id="profile-edit">
         <h1>Modifier votre profil</h1>
         <form id="profile-form">
-          <label for="Name" class="form-label">Votre nom :</label>
+          <label for="name">Votre nom :</label>
           <input
             placeholder="Dupont"
-            name="Name"
+            id="name"
             v-model="name"
             class="form-input"
             type="text"
           />
-
-          <label for="Surname" class="form-label">Votre prénom : </label>
+          <label for="surname">Votre prénom : </label>
           <input
             placeholder="Dominique"
-            name="Surname"
+            id="surname"
             v-model="surname"
             class="form-input"
             type="text"
           />
 
-          <label for="Email" class="form-label">Votre e-mail : </label>
+          <label for="email">Votre e-mail : </label>
           <input
             placeholder="contact@groupomania.com"
-            name="Email"
+            id="email"
             v-model="email"
             class="form-input"
             type="email"
           />
 
-          <label for="Password" class="form-label">Votre mot de passe : </label>
+          <label for="password">Votre mot de passe : </label>
           <input
             placeholder="123456AzErTy*"
-            name="Password"
+            id="password"
             v-model="password"
             class="form-input"
             type="password"
           />
 
-          <label for="Repeat-Password" class="form-label"
-            >Répétez votre mot de passe :
-          </label>
+          <label for="repeat-password">Répétez votre mot de passe : </label>
           <input
             placeholder="123456AzErTy*"
-            name="Repeat-Password"
+            id="repeat-password"
             v-model="repeatedPassword"
             class="form-input"
             type="password"
@@ -66,24 +63,20 @@
       <div v-else-if="isSupprVisible === true" id="profile-suppr">
         <h1>Supprimer votre compte</h1>
         <form id="profile-form">
-          <label for="Password" class="form-label"
-            >Saisissez votre mot de passe :
-          </label>
+          <label for="password">Saisissez votre mot de passe : </label>
           <input
             placeholder="123456AzErTy*"
-            name="Password"
+            id="password"
             v-model="password"
             class="form-input"
             type="password"
             required
           />
 
-          <label for="Repeat-Password" class="form-label"
-            >Répétez votre mot de passe :
-          </label>
+          <label for="repeat-password">Répétez votre mot de passe : </label>
           <input
             placeholder="123456AzErTy*"
-            name="Repeat-Password"
+            id="repeat-password"
             v-model="repeatedPassword"
             class="form-input"
             type="password"
@@ -178,10 +171,8 @@ export default {
       text = text.trim();
       // on bloque si des champs requis sont manquants
       if (text && !pattern.test(text)) {
-        console.log("checktest false");
         return false;
       } else {
-        console.log("checktest true");
         return true;
       }
     },

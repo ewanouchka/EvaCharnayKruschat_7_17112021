@@ -9,55 +9,50 @@
     <h1>Enregistrez votre compte utilisateur</h1>
     <p>Veuillez remplir tous les champs</p>
     <form id="signup-form">
-      <label for="Name" class="form-label"
-        >Votre nom : {{ name.pattern }}</label
-      >
+      <label for="name">Votre nom : {{ name.pattern }}</label>
       <input
         placeholder="Dupont"
-        name="Name"
+        id="name"
         v-model="name"
         class="form-input"
         type="text"
         required
       />
 
-      <label for="Surname" class="form-label">Votre prénom : </label>
+      <label for="surname">Votre prénom : </label>
       <input
         placeholder="Dominique"
-        name="Surname"
+        id="surname"
         v-model="surname"
         class="form-input"
         type="text"
         required
       />
 
-      <label for="Email" class="form-label">Votre e-mail : </label>
+      <label for="email">Votre e-mail : </label>
       <input
         placeholder="contact@groupomania.com"
-        name="Email"
+        id="email"
         v-model="email"
         class="form-input"
         type="email"
         required
       />
 
-      <!-- oninput="checkValidity(this)" -->
-      <label for="Password" class="form-label">Votre mot de passe : </label>
+      <label for="password">Votre mot de passe : </label>
       <input
         placeholder="123456AzErTy*"
-        name="Password"
+        id="password"
         v-model="password"
         class="form-input"
         type="password"
         required
       />
 
-      <label for="Repeat-Password" class="form-label"
-        >Répétez votre mot de passe :
-      </label>
+      <label for="repeat-password">Répétez votre mot de passe : </label>
       <input
         placeholder="123456AzErTy*"
-        name="Repeat-Password"
+        id="repeat-password"
         v-model="repeatedPassword"
         class="form-input"
         type="password"
@@ -210,7 +205,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 #signup-form {
   display: flex;

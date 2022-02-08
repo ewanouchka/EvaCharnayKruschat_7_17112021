@@ -3,10 +3,10 @@
     <h1>Bienvenue !</h1>
     <p>Connectez-vous à votre compte utilisateur</p>
     <form id="login-form">
-      <label for="Email" class="form-label">Votre e-mail : </label>
+      <label for="email">Votre e-mail : </label>
       <input
         placeholder="contact@groupomania.com"
-        name="Email"
+        id="email"
         v-model="email"
         class="form-input"
         type="email"
@@ -14,10 +14,10 @@
       />
       <!-- oninput="checkValidity(this)" -->
 
-      <label for="Password" class="form-label">Votre mot de passe : </label>
+      <label for="password">Votre mot de passe : </label>
       <input
         placeholder="1234AzErTy*"
-        name="Password"
+        id="password"
         v-model="password"
         class="form-input"
         type="password"
