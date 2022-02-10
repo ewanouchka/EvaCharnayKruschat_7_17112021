@@ -10,6 +10,12 @@
           >, le
           <span v-html="message.createdAt"></span>
         </h3>
+        <img
+          v-if="message.attachment"
+          :src="message.attachment"
+          class="imagePost"
+          alt="image illustration"
+        />
         <p>{{ message.content }}</p>
         <div class="post-options">
           <a href="#bottom" title="répondre au message"
@@ -341,5 +347,10 @@ h2 {
   position: absolute;
   top: 0;
   right: 0;
+}
+
+.imagePost {
+  max-width: 500px;
+  margin: auto;
 }
 </style>

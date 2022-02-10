@@ -4,6 +4,9 @@ const { Op } = require("sequelize");
 // import des models
 const models = require("../db/models");
 
+// import package file system de node (pour opération suppression de fichier)
+const fs = require("fs");
+
 // fonctions de vérification des champs des requêtes
 const checkTextValidity = (text) => {
   // on supprime les espaces au début et à la fin de la chaîne
@@ -113,6 +116,7 @@ exports.sendMessage = (req, res, next) => {
         UserId: userId,
         title: req.body.title.trim(),
         content: req.body.content.trim(),
+        attachment: req.file ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}` : null,
       })
         .then(() => {
           return res.status(201).json({ message: "Message enregistré !" });
@@ -142,10 +146,19 @@ exports.updateMessage = (req, res, next) => {
 
       checkValidityEdit(req.body.title, req.body.content);
 
+      if (req.file) {
+        // on supprime l'image des fichiers images
+        const filename = messageFound.attachment.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {});
+      }
+
       messageFound
         .update({
           title: req.body.title ? req.body.title.trim() : messageFound.title,
           content: req.body.content ? req.body.content.trim() : messageFound.content,
+          attachment: req.file
+            ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+            : messageFound.attachment,
         })
         .then(() => {
           return res.status(201).json({ message: "Message modifié !" });
@@ -176,6 +189,12 @@ exports.deleteMessage = (req, res, next) => {
       if (!isAdmin && messageFound.UserId != userId) {
         return res.status(403).json({ error: "Utilisateur non autorisé" });
       }
+      if (messageFound.attachment) {
+        // on supprime l'image des fichiers images
+        const filename = messageFound.attachment.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {});
+      }
+
       messageFound
         .destroy({ where: { id: req.params.messageId } })
         .then(() => {

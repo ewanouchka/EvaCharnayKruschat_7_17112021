@@ -20,6 +20,27 @@
           v-model="postContent"
           required
         />
+        <label for="attachment" class="button-link" id="attachmentLabel"
+          >Ajouter une image</label
+        >
+        <input
+          type="file"
+          name="attachment"
+          id="attachment"
+          class="post-input"
+          v-on:change="addFile()"
+          ref="attachment"
+        />
+        <div v-if="attachment !== ''" class="attachmentPreview">
+          <p>
+            {{ attachment.name }}
+          </p>
+          <i
+            @click.prevent="deleteAttachment()"
+            class="fas fa-trash-alt post-options__icons"
+            title="supprimer le message"
+          ></i>
+        </div>
       </div>
       <button
         v-if="contextPost === 'postSubmit'"
@@ -66,6 +87,7 @@ export default {
       postTitle: "",
       postContent: "",
       inputValidity: false,
+      attachment: "",
     };
   },
   methods: {
@@ -156,6 +178,9 @@ export default {
         );
       } else this.inputValidity = true;
     },
+    addFile() {
+      this.attachment = this.$refs.attachment.files[0];
+    },
     postSubmit() {
       this.checkValidityPost();
       if (this.inputValidity) {
@@ -166,15 +191,14 @@ export default {
             const userToken = JSON.parse(
               localStorage.getItem("userAuth")
             ).token;
+            const formData = new FormData();
+            formData.append("title", this.postTitle);
+            formData.append("content", this.postContent);
+            formData.append("attachment", this.attachment);
             await fetch("http://localhost:3000/api/messages", {
               method: "POST",
-              body: JSON.stringify({
-                title: this.postTitle,
-                content: this.postContent,
-                attachment: null,
-              }),
+              body: formData,
               headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${userToken}`,
               },
             });
@@ -197,16 +221,15 @@ export default {
               localStorage.getItem("userAuth")
             ).token;
             const messageId = this.$route.params.messageId;
+            const formData = new FormData();
+            formData.append("title", this.postTitle);
+            formData.append("content", this.postContent);
+            formData.append("attachment", this.attachment);
 
             await fetch(`http://localhost:3000/api/messages/${messageId}`, {
               method: "PUT",
-              body: JSON.stringify({
-                title: this.postTitle,
-                content: this.postContent,
-                attachment: null,
-              }),
+              body: formData,
               headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${userToken}`,
               },
             });
@@ -224,6 +247,9 @@ export default {
           `Assurez-vous que tous les champs sont correctement renseignés :\n- Le titre et le contenu doivent comporter au moins 3 caractères.`
         );
       }
+    },
+    deleteAttachment() {
+      this.attachment = "";
     },
   },
   beforeMount() {
@@ -265,5 +291,24 @@ export default {
   border-radius: 0.5rem;
   text-align: justify;
   font-family: var(--font-text);
+}
+#attachment {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+#attachmentLabel {
+  cursor: pointer;
+  width: fit-content;
+  padding: 0 1rem;
+  margin: 0 0 1rem 0;
+}
+.attachmentPreview {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: space-around;
+}
+.post-options__icons {
+  margin: 1rem;
 }
 </style>

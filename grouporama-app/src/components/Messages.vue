@@ -13,6 +13,12 @@
           >, le
           <span v-html="item.createdAt"></span>
         </h3>
+        <img
+          v-if="item.attachment"
+          :src="item.attachment"
+          class="imagePost"
+          alt="image illustration"
+        />
         <p>{{ item.content }}</p>
         <div class="post-options">
           <router-link
@@ -98,6 +104,7 @@ export default {
           });
 
           const postsJSON = await posts.json();
+          console.log(postsJSON.messages);
           this.isAdmin = postsJSON.isAdmin;
 
           if (postsJSON.messages.length > 0) {
@@ -221,5 +228,10 @@ p {
   &:hover {
     color: var(--color-secondary);
   }
+}
+
+.imagePost {
+  max-width: 500px;
+  margin: auto;
 }
 </style>

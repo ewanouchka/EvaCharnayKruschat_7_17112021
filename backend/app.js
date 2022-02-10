@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
+const helmet = require("helmet");
 
 // import des routes
 const userRoutes = require("./routes/users.js");
@@ -34,10 +35,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // pour transformer le corps de la requête en objet maintenable
 app.use(bodyParser.json());
 
+// pour la gestion de l'enregistrement des images
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 // pour l'utilisation des routes
 app.use("/api/auth", userRoutes); // revoir convention de nommage
 app.use("/api/profiles", profileRoutes); // revoir convention de nommage
 app.use("/api/messages", messageRoutes); // revoir convention de nommage
 app.use("/api/messages", commentRoutes); // revoir convention de nommage
+
+app.use(helmet());
 
 module.exports = app;
